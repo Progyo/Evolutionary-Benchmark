@@ -7,6 +7,9 @@ using Unity.Transforms;
 using UnityEngine;
 using Unity.Mathematics;
 
+
+[assembly: RegisterGenericComponentType(typeof(EntityTypeComponent))]
+
 [BurstCompile]
 public readonly partial struct SeeRadiusAspect : IAspect
 {
@@ -33,4 +36,54 @@ public readonly partial struct SeeRadiusAspect : IAspect
         }
     }*/
 
+    [BurstCompile]
+    public void UpdateView(NativeArray<LocalToWorldTransform> transforms, NativeArray<EntityTypeComponent> types, BufferLookup<SeeBufferComponent> bufferLookup)
+    {
+        
+        bool successful = bufferLookup.TryGetBuffer(entity, out DynamicBuffer<SeeBufferComponent> buffer);
+        
+        if (!successful) 
+        {
+            return;
+        }
+
+        buffer.Clear();
+
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            float3 pos =transforms[i].Value.Position;//SystemAPI.GetComponent<LocalToWorldTransform>(entities[i]).Value.Position;
+            float distance = math.distance(transformAspect.Position, pos);
+
+            if(distance == 0) 
+            {
+                continue;
+            }
+
+            if(distance < seeRadius.ValueRO.value) 
+            {
+                EntityType type = types[i].value;
+                ItemType itemType = getType(type);
+                buffer.Add(new SeeBufferComponent { distance = distance, itemType = itemType, position = pos });
+            }
+
+
+            
+        }
+    }
+
+    [BurstCompile]
+    private ItemType getType(EntityType entityType) 
+    {
+        if(entityType == EntityType.blob) 
+        {
+            return ItemType.enemy;
+        }
+        else if (entityType == EntityType.food) 
+        {
+            return ItemType.food;
+        }
+
+
+        return ItemType.enemy;
+    }
 }

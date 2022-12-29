@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
-
+using Unity.Mathematics;
 
 [assembly: RegisterGenericComponentType(typeof(SimStateComponent))]
 [assembly: RegisterGenericComponentType(typeof(SimStateAuthoring))]
@@ -33,6 +33,14 @@ public class SimStateAuthoring : MonoBehaviour
     /// The maximum entities to simulate
     /// </summary>
     public int maxEntities;
+
+
+    /// <summary>
+    /// The seed for the random generator
+    /// </summary>
+    public uint seed;
+
+    public GameObject prefab;
 }
 
 
@@ -46,6 +54,9 @@ public class SimStateBaker : Baker<SimStateAuthoring>
             currentEpoch = authoring.currentEpoch,
             maxEpochs = authoring.maxEpochs,
             maxEntities = authoring.maxEntities,
+            entityPrefab = GetEntity(authoring.prefab)
         });
+
+        AddComponent(new RandomComponent { value = new Unity.Mathematics.Random(authoring.seed) });
     }
 }

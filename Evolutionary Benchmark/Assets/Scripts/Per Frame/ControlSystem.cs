@@ -18,7 +18,7 @@ public partial struct ControlSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-       
+        state.RequireForUpdate<SimStateComponent>();
     }
 
     [BurstCompile]
@@ -63,6 +63,7 @@ public partial struct ControlSystem : ISystem
         public void Execute(ref MoveAspect move) 
         {
             move.Move(deltaTime);
+            move.Rotate();
             //move.Position += new float3(deltaTime,0f,0f);
         }
     }

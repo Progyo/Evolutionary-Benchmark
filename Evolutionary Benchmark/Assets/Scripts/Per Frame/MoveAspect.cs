@@ -19,11 +19,18 @@ public readonly partial struct MoveAspect : IAspect
     {
         float3 dir = math.normalize(targetPosition.ValueRO.value - transformAspect.Position);
 
-        if(math.lengthsq(dir) > 0.01f) 
+        if(math.lengthsq(dir) > 0.05f) 
         {
             transformAspect.Position += dir * deltaTime * speed.ValueRO.value / size.ValueRO.value;
+            
         }
 
-        
+    }
+
+    [BurstCompile]
+    public void Rotate()
+    {
+        transformAspect.LookAt(targetPosition.ValueRO.value);
+
     }
 }

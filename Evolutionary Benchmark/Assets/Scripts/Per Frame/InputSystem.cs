@@ -6,29 +6,103 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
 
+
+[UpdateAfter(typeof(EpochTimer))]
+public partial class InputSystem : SystemBase
+{
+    protected override void OnUpdate()
+    {
+        RequireForUpdate<SimStateComponent>();
+        BufferLookup<SeeBufferComponent>  _seeBufferLookup = GetBufferLookup<SeeBufferComponent>(false);
+
+
+        EntityQuery _SeeQuery = EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
+            
+        //new EntityQueryBuilder(Allocator.Temp)
+        //.WithAllRW<LocalToWorldTransform>()
+        //.AddAdditionalQuery()
+        //.WithAllRW<EntityTypeComponent>()
+        //.Build(this);
+
+        bool success = SystemAPI.TryGetSingleton<SimStateComponent>(out SimStateComponent simState);
+
+        if (success && simState.phase == Phase.running)
+        {
+            //EntityQuery query = state.WorldUnmanaged.EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
+
+
+
+            NativeArray<LocalToWorldTransform> transforms = _SeeQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
+            NativeArray<EntityTypeComponent> types = _SeeQuery.ToComponentDataArray<EntityTypeComponent>(Allocator.TempJob);
+
+            _seeBufferLookup.Update(this);
+            JobHandle handle = new RadiusSeeJob { bufferLookup = _seeBufferLookup, transforms = transforms, types = types }.ScheduleParallel(this.Dependency);
+            handle.Complete();
+
+            transforms.Dispose();
+            types.Dispose();
+        }
+    }
+
+
+    [BurstCompile]
+    private partial struct RadiusSeeJob : IJobEntity
+    {
+        [NativeDisableParallelForRestriction]
+        public BufferLookup<SeeBufferComponent> bufferLookup;
+
+        [ReadOnly]
+        public NativeArray<LocalToWorldTransform> transforms;
+
+        [ReadOnly]
+        public NativeArray<EntityTypeComponent> types;
+
+
+
+        [BurstCompile]
+        public void Execute(ref SeeRadiusAspect aspect, [EntityInQueryIndex] int index)
+        {
+            aspect.UpdateView(transforms, types, bufferLookup);
+        }
+    }
+}
+
+/*
 [BurstCompile]
 [UpdateAfter(typeof(EpochTimer))]
 public partial struct InputSystem : ISystem
 {
+
+    private BufferLookup<SeeBufferComponent> _seeBufferLookup;
+
+    private EntityQuery _SeeQuery;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<SimStateComponent>();
+        _seeBufferLookup = state.GetBufferLookup<SeeBufferComponent>(false);
+
+        _SeeQuery = new EntityQueryBuilder(Allocator.Temp)
+        .WithAllRW<LocalToWorldTransform>()
+        .AddAdditionalQuery()
+        .WithAllRW<EntityTypeComponent>()
+        .Build(ref state);//(ref state)
         
+         //var builder = new EntityQueryBuilder(Allocator.Temp)
+         //.WithAllRW<LocalToWorldTransform>()
+         //.AddAdditionalQuery()
+         //.WithAllRW<EntityTypeComponent>();
+
+
+         //_SeeQuery = state.EntityManager.CreateEntityQuery(in builder); 
     }
 
     [BurstCompile]
     public void OnDestroy(ref SystemState state)
     {
-        //Dispose of see item arrays
-        /*
-        foreach (SeeComponent sees in SystemAPI.Query<SeeComponent>())
-        {
-            if (sees.value.IsCreated) 
-            {
-                sees.value.Dispose();
-            }
-            
-        }*/
+
+        //_SeeQuery.Dispose();
     }
 
     [BurstCompile]
@@ -39,21 +113,19 @@ public partial struct InputSystem : ISystem
 
         if(success && simState.phase == Phase.running) 
         {
+            //EntityQuery query = state.WorldUnmanaged.EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
 
-            /*
-            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-            .WithAllRW<TransformAspect>()
-            .AddAdditionalQuery()
-            .WithAllRW<EntityTypeComponent>()
-            .Build(ref state);
+           
 
-            NativeArray<Entity> entities = query.ToEntityArray(Allocator.TempJob);
-            */
+            NativeArray<LocalToWorldTransform> transforms = _SeeQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
+            NativeArray<EntityTypeComponent> types = _SeeQuery.ToComponentDataArray<EntityTypeComponent>(Allocator.TempJob);
 
-            JobHandle handle = new RadiusSeeJob { }.ScheduleParallel(state.Dependency);
+            _seeBufferLookup.Update(ref state);
+            JobHandle handle = new RadiusSeeJob { bufferLookup = _seeBufferLookup, transforms =transforms, types =types}.ScheduleParallel(state.Dependency);
             handle.Complete();
 
-            //entities.Dispose();
+            transforms.Dispose();
+            types.Dispose();
         }
 
     }
@@ -61,18 +133,22 @@ public partial struct InputSystem : ISystem
     [BurstCompile]
     private partial struct RadiusSeeJob : IJobEntity
     {
-        
-        [ReadOnly] 
+        [NativeDisableParallelForRestriction]
         public BufferLookup<SeeBufferComponent> bufferLookup;
 
-        //[ReadOnly]
-        //public NativeArray<Entity> entities;
+        [ReadOnly]
+        public NativeArray<LocalToWorldTransform> transforms;
+
+        [ReadOnly]
+        public NativeArray<EntityTypeComponent> types;
+
+
 
         [BurstCompile]
         public void Execute(ref SeeRadiusAspect aspect, [EntityInQueryIndex] int index) 
         {
-
+            aspect.UpdateView(transforms, types , bufferLookup);
         }
     }
 }
-
+*/

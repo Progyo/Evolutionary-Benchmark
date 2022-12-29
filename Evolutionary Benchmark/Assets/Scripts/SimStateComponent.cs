@@ -31,4 +31,9 @@ public struct SimStateComponent : IComponentData
     /// The maximum entities to simulate
     /// </summary>
     public int maxEntities;
+
+    /// <summary>
+    /// The entity prefab
+    /// </summary>
+    public Entity entityPrefab;
 }

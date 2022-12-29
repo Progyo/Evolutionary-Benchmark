@@ -16,6 +16,8 @@ using Unity.Mathematics;
 //[assembly: RegisterGenericComponentType(typeof(SeeComponent))]
 [assembly: RegisterGenericComponentType(typeof(TargetPositionComponent))]
 [assembly: RegisterGenericComponentType(typeof(EntityTypeComponent))]
+[assembly: RegisterGenericComponentType(typeof(MaxDecisionSpeedComponent))]
+[assembly: RegisterGenericComponentType(typeof(DecisionSpeedComponent))]
 public class BodyAuthoring : MonoBehaviour
 {
     public float speed;
@@ -23,6 +25,7 @@ public class BodyAuthoring : MonoBehaviour
     public float maxHealth;
     public float maxEnergy;
     public float viewDistance;
+    public float maxDecisionSpeed;
 }
 
 
@@ -41,5 +44,9 @@ public class BodyBaker : Baker<BodyAuthoring>
         //Shouldn't be able to see more than 50 things at once
         AddComponent<TargetPositionComponent>(new TargetPositionComponent { value = new float3(10f, 0f, 0f) });
         AddComponent<EntityTypeComponent>(new EntityTypeComponent { value = EntityType.blob});
+        AddBuffer<SeeBufferComponent>();
+
+        AddComponent<MaxDecisionSpeedComponent>(new MaxDecisionSpeedComponent { value = authoring.maxDecisionSpeed });
+        AddComponent<DecisionSpeedComponent>(new DecisionSpeedComponent { value = authoring.maxDecisionSpeed });
     }
 }
