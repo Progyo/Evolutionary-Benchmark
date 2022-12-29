@@ -4,16 +4,21 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Burst;
 using Unity.Transforms;
+using Unity.VisualScripting;
 
 
 [BurstCompile]
-[UpdateAfter(typeof(EpochTimer))]
+[UpdateAfter(typeof(InputSystem))]
+//[CreateAfter(typeof(EpochTimer))]
 public partial struct ControlSystem : ISystem
 {
+
+    //private RefRW<SimStateComponent> simState;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-
+       
     }
 
     [BurstCompile]
@@ -25,11 +30,28 @@ public partial struct ControlSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        float deltaTime = SystemAPI.Time.DeltaTime;
 
-        JobHandle handle = new MoveJob { deltaTime = deltaTime}.ScheduleParallel(state.Dependency);
 
-        handle.Complete();
+        //EntityQuery query = state.GetEntityQuery(typeof(SimStateComponent));
+
+        //SystemAPI.get
+        //SimStateComponent simState;
+        
+        bool success = SystemAPI.TryGetSingleton<SimStateComponent>(out SimStateComponent simState);
+
+
+        if (success && simState.phase == Phase.running)
+        {
+
+            float deltaTime = SystemAPI.Time.DeltaTime;
+
+            JobHandle handle = new MoveJob { deltaTime = deltaTime }.ScheduleParallel(state.Dependency);
+
+            handle.Complete();
+
+        }
+
+
     }
 
     [BurstCompile]

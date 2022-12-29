@@ -13,7 +13,9 @@ using Unity.Mathematics;
 [assembly: RegisterGenericComponentType(typeof(HealthComponent))]
 [assembly: RegisterGenericComponentType(typeof(EnergyComponent))]
 [assembly: RegisterGenericComponentType(typeof(EyeRadiusComponent))]
+//[assembly: RegisterGenericComponentType(typeof(SeeComponent))]
 [assembly: RegisterGenericComponentType(typeof(TargetPositionComponent))]
+[assembly: RegisterGenericComponentType(typeof(EntityTypeComponent))]
 public class BodyAuthoring : MonoBehaviour
 {
     public float speed;
@@ -35,7 +37,9 @@ public class BodyBaker : Baker<BodyAuthoring>
         AddComponent<HealthComponent>(new HealthComponent { value = authoring.maxHealth });
         AddComponent<EnergyComponent>(new EnergyComponent { value = authoring.maxEnergy });
         AddComponent<EyeRadiusComponent>(new EyeRadiusComponent { value = authoring.viewDistance });
-        //AddComponent(new SeeComponent { value = new NativeArray<SeeItem>(0,Allocator.Persistent) });
+
+        //Shouldn't be able to see more than 50 things at once
         AddComponent<TargetPositionComponent>(new TargetPositionComponent { value = new float3(10f, 0f, 0f) });
+        AddComponent<EntityTypeComponent>(new EntityTypeComponent { value = EntityType.blob});
     }
 }

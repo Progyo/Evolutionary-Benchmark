@@ -1,6 +1,5 @@
 using Unity.Entities;
 
-
 public partial class EpochTimer : SystemBase
 {
     protected override void OnUpdate()
