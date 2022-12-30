@@ -6,8 +6,6 @@ using Unity.Collections;
 using Unity.Mathematics;
 
 [assembly: RegisterGenericComponentType(typeof(BodyAuthoring))]
-[assembly: RegisterGenericComponentType(typeof(SizeComponent))]
-[assembly: RegisterGenericComponentType(typeof(SpeedComponent))]
 [assembly: RegisterGenericComponentType(typeof(MaxHealthComponent))]
 [assembly: RegisterGenericComponentType(typeof(MaxEnergyComponent))]
 [assembly: RegisterGenericComponentType(typeof(HealthComponent))]
@@ -33,8 +31,8 @@ public class BodyBaker : Baker<BodyAuthoring>
 {
     public override void Bake(BodyAuthoring authoring)
     {
-        AddComponent<SizeComponent>(new SizeComponent { value = authoring.size });
-        AddComponent<SpeedComponent>(new SpeedComponent { value = authoring.speed });
+        //AddComponent<SizeComponent>(new SizeComponent { value = authoring.size });
+        //AddComponent<SpeedComponent>(new SpeedComponent { value = authoring.speed });
         AddComponent<MaxHealthComponent>(new MaxHealthComponent { value = authoring.maxHealth });
         AddComponent<MaxEnergyComponent>(new MaxEnergyComponent { value = authoring.maxEnergy});
         AddComponent<HealthComponent>(new HealthComponent { value = authoring.maxHealth });
@@ -48,5 +46,12 @@ public class BodyBaker : Baker<BodyAuthoring>
 
         AddComponent<MaxDecisionSpeedComponent>(new MaxDecisionSpeedComponent { value = authoring.maxDecisionSpeed });
         AddComponent<DecisionSpeedComponent>(new DecisionSpeedComponent { value = authoring.maxDecisionSpeed });
+
+
+
+        AddBuffer<TraitBufferComponent<float>>();
+        AppendToBuffer<TraitBufferComponent<float>>(new TraitBufferComponent<float> { traitType = TraitType.speed, value = authoring.speed });
+        AddBuffer<TraitBufferComponent<int>>();
+        AppendToBuffer<TraitBufferComponent<int>>(new TraitBufferComponent<int> { traitType = TraitType.size, value = authoring.size });
     }
 }

@@ -5,5 +5,24 @@
 [System.Serializable]
 public enum Phase 
 {
-    start, running, end, stop
+    /// <summary>
+    /// The beginning of an epoch (Spawn entities etc)
+    /// </summary>
+    start,
+    /// <summary>
+    /// State while epoch is running
+    /// </summary>
+    running,
+    /// <summary>
+    /// End of epoch 
+    /// </summary>
+    end,
+    /// <summary>
+    /// The simulation is over
+    /// </summary>
+    stop,
+    /// <summary>
+    /// End of epoch evaluated
+    /// </summary>
+    evaluated
 }

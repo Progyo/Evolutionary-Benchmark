@@ -27,7 +27,7 @@ public readonly partial struct SpawnAspect : IAspect
             float3 pos =  transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(min,max), 0f, spawnPoint.ValueRW.random.NextFloat(min, max));
             UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = 1f };
             Entity e = ecb.Instantiate(sortKey, entity);
-            ecb.SetComponent<SpeedComponent>(sortKey, e, new SpeedComponent { value = spawnPoint.ValueRW.random.NextFloat(1f, 20f) });
+            //ecb.SetComponent<SpeedComponent>(sortKey, e, new SpeedComponent { value = spawnPoint.ValueRW.random.NextFloat(1f, 20f) });
             ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
         }
 
