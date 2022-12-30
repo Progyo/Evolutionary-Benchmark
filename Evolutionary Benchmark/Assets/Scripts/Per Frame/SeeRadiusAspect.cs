@@ -49,6 +49,7 @@ public readonly partial struct SeeRadiusAspect : IAspect
 
         buffer.Clear();
 
+        //Super slow
         for (int i = 0; i < transforms.Length; i++)
         {
             float3 pos =transforms[i].Value.Position;//SystemAPI.GetComponent<LocalToWorldTransform>(entities[i]).Value.Position;
