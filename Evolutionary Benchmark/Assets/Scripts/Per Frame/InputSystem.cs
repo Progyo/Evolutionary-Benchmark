@@ -35,12 +35,15 @@ public partial class InputSystem : SystemBase
             NativeArray<LocalToWorldTransform> transforms = _SeeQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
             NativeArray<EntityTypeComponent> types = _SeeQuery.ToComponentDataArray<EntityTypeComponent>(Allocator.TempJob);
 
+            NativeArray<Entity> entities = _SeeQuery.ToEntityArray(Allocator.TempJob);
+
             _seeBufferLookup.Update(this);
-            JobHandle handle = new RadiusSeeJob { bufferLookup = _seeBufferLookup, transforms = transforms, types = types }.ScheduleParallel(this.Dependency);
+            JobHandle handle = new RadiusSeeJob { bufferLookup = _seeBufferLookup, transforms = transforms, types = types, entities = entities}.ScheduleParallel(this.Dependency);
             handle.Complete();
 
             transforms.Dispose();
             types.Dispose();
+            entities.Dispose();
         }
     }
 
@@ -57,12 +60,13 @@ public partial class InputSystem : SystemBase
         [ReadOnly]
         public NativeArray<EntityTypeComponent> types;
 
-
+        [ReadOnly]
+        public NativeArray<Entity> entities;
 
         [BurstCompile]
         public void Execute(ref SeeRadiusAspect aspect, [EntityInQueryIndex] int index)
         {
-            aspect.UpdateView(transforms, types, bufferLookup);
+            aspect.UpdateView(transforms, types, bufferLookup, entities);
         }
     }
 }

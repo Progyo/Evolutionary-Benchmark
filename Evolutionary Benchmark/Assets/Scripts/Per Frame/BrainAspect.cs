@@ -86,112 +86,88 @@ public readonly partial struct BrainAspect : IAspect
 
 }
 
-[BurstCompile]
-public struct TargetTest
-{
-    private RefRW<TargetPositionComponent> _target;
-
-    [BurstCompile]
-    public void SetTarget(RefRW<TargetPositionComponent> target) 
-    {
-        _target = target;
-    }
-
-
-    [BurstCompile]
-    public void Move() 
-    {
-        _target.ValueRW.value = new float3(1000f, 0f, 0f);
-    }
-}
-
-
 
 [BurstCompile]
 public struct BrainTest :  IBrain
 {
     //bool successful = bufferLookup.TryGetBuffer(entity, out DynamicBuffer<SeeBufferComponent> buffer);
-    public  Entity entity;
+    
 
 
-    private LocalToWorldTransform _transform;
+    private RefRW<LocalToWorldTransform> _transform;
     private RefRW<TargetPositionComponent> _target;
-    private MaxDecisionSpeedComponent _maxDecisionSpeed;
-    private DecisionSpeedComponent _decisionTimeLeft;
-    private EnergyComponent _energy;
-    private HealthComponent _health;
+    private RefRW<MaxDecisionSpeedComponent> _maxDecisionSpeed;
+    private RefRW<DecisionSpeedComponent> _decisionTimeLeft;
+    private RefRW<EnergyComponent> _energy;
+    private RefRW<HealthComponent> _health;
+    private RefRW<Entity> _entity;
 
-    public LocalToWorldTransform transform { get { return _transform; } set { _transform = value; } }
+    public RefRW<Entity> entity { get { return _entity; } set { _entity = value; } }
+    public RefRW<LocalToWorldTransform> transform { get { return _transform; } set { _transform = value; } }
     public RefRW<TargetPositionComponent> target { get { return _target; } set { _target = value; } }
-    public MaxDecisionSpeedComponent maxDecisionSpeed { get { return _maxDecisionSpeed; } set { _maxDecisionSpeed = value; } }
-    public DecisionSpeedComponent decisionTimeLeft { get { return _decisionTimeLeft; } set { _decisionTimeLeft = value; } }
-    public EnergyComponent energy { get { return _energy; } set { _energy = value; } }
-    public HealthComponent health { get { return _health; } set { _health = value; } }
+    public RefRW<MaxDecisionSpeedComponent> maxDecisionSpeed { get { return _maxDecisionSpeed; } set { _maxDecisionSpeed = value; } }
+    public RefRW<DecisionSpeedComponent> decisionTimeLeft { get { return _decisionTimeLeft; } set { _decisionTimeLeft = value; } }
+    public RefRW<EnergyComponent> energy { get { return _energy; } set { _energy = value; } }
+    public RefRW<HealthComponent> health { get { return _health; } set { _health = value; } }
 
 
 
 
     [BurstCompile]
-    public void See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random)
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo)
     {
 
         float max = 10f;
         float min = -max;
+        moveTo = transform.ValueRO.Value.Position;
 
+        bool successful = bufferLookup.TryGetBuffer(_entity.ValueRO, out DynamicBuffer<SeeBufferComponent> buffer);
 
-        _decisionTimeLeft.value -= deltaTime;
-
-        if (decisionTimeLeft.value <= 0f)
+        if (!successful)
         {
-            bool successful = bufferLookup.TryGetBuffer(entity, out DynamicBuffer<SeeBufferComponent> buffer);
-
-            if (!successful)
-            {
-                return;
-            }
-
-            float closestDistance = 1000f;
-            float3 closestPos = _transform.Value.Position;
-            bool foodFound = false;
-
-            if (!buffer.IsEmpty)
-            {
-                for (int i = 0; i < buffer.Length; i++)
-                {
-                    if (buffer[i].itemType == ItemType.food && closestDistance > buffer[i].distance)
-                    {
-                        closestDistance = buffer[i].distance;
-                        closestPos = buffer[i].position;
-                        foodFound |= true;
-                    }
-                }
-            }
-
-            if (!foodFound)
-            {
-                closestPos += new float3(random.ValueRW.value.NextFloat(min, max), 0f, random.ValueRW.value.NextFloat(min, max));
-            }
-
-            _target.ValueRW.value = new float3(100f,0f,0f);//closestPos;
-
-            //Reset
-            _decisionTimeLeft.value = maxDecisionSpeed.value * random.ValueRW.value.NextFloat(0.01f, 1f);
-
-
-            float cost = 1f;
-
-            //Action cost
-            if (energy.value > 0)
-            {
-                _energy.value -= cost;
-            }
-            else
-            {
-                _health.value -= cost;
-            }
-
+            
+            return BrainAction.nothing;
         }
 
+        float closestDistance = 1000f;
+        float3 closestPos = _transform.ValueRO.Value.Position;
+        bool foodFound = false;
+
+        if (!buffer.IsEmpty)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                if (buffer[i].itemType == ItemType.food && closestDistance > buffer[i].distance)
+                {
+                    closestDistance = buffer[i].distance;
+                    closestPos = buffer[i].position;
+                    foodFound |= true;
+                }
+            }
+        }
+
+        if (!foodFound)
+        {
+            closestPos += new float3(random.ValueRW.value.NextFloat(min, max), 0f, random.ValueRW.value.NextFloat(min, max));
+        }
+
+        //_target.ValueRW.value = closestPos;
+        moveTo = closestPos;
+
+        float cost = 1f;
+
+        //Action cost
+        if (_energy.ValueRO.value > 0)
+        {
+            _energy.ValueRW.value -= cost;
+        }
+        else
+        {
+            _health.ValueRW.value -= cost;
+        }
+
+
+        return BrainAction.move;
 
     }
 

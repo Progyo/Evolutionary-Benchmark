@@ -7,11 +7,8 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEditor.Rendering.LookDev;
-using UnityEngine;
-using static BrainSystem;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 //[assembly: RegisterGenericJobType(typeof(BrainJob<BrainAspect>))]
 
@@ -36,6 +33,7 @@ public partial struct BrainSystem : ISystem
     ComponentTypeHandle<DecisionSpeedComponent> _decisionTimeLeftTypeHandle;
     ComponentTypeHandle<EnergyComponent> _energyTypeHandle;
     ComponentTypeHandle<HealthComponent> _healthTypeHandle;
+    EntityTypeHandle _entityTypeHandle;
 
     [BurstCompile]
     public void OnCreate(ref SystemState state)
@@ -65,6 +63,7 @@ public partial struct BrainSystem : ISystem
         _decisionTimeLeftTypeHandle = state.GetComponentTypeHandle<DecisionSpeedComponent>();
         _energyTypeHandle = state.GetComponentTypeHandle<EnergyComponent>();
         _healthTypeHandle = state.GetComponentTypeHandle<HealthComponent>();
+        _entityTypeHandle = state.GetEntityTypeHandle();
     }
 
     [BurstCompile]
@@ -94,6 +93,7 @@ public partial struct BrainSystem : ISystem
             _decisionTimeLeftTypeHandle.Update(ref state);
             _energyTypeHandle.Update(ref state);
             _healthTypeHandle.Update(ref state);
+            _entityTypeHandle.Update(ref state);
 
             //NativeArray<LocalToWorldTransform> transforms = _brainQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
 
@@ -106,7 +106,8 @@ public partial struct BrainSystem : ISystem
                 maxDecisionSpeedTypeHandle = _maxDecisionSpeedTypeHandle,
                 decisionTimeLeftTypeHandle = _decisionTimeLeftTypeHandle,
                 energyTypeHandle = _energyTypeHandle,
-                healthTypeHandle = _healthTypeHandle
+                healthTypeHandle = _healthTypeHandle,
+                entityTypeHandle = _entityTypeHandle
             }.ScheduleParallel(_brainQuery, state.Dependency);
             handle.Complete();
 
@@ -220,7 +221,7 @@ public partial struct BrainJob: IJobEntity//<T> : IJobEntity where T :  IAspect,
 
 
 [BurstCompile]
-public struct BrainJob<T> : IJobChunk where T : struct, IBrain
+public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
 {
     [NativeDisableParallelForRestriction]
     public BufferLookup<SeeBufferComponent> bufferLookup;
@@ -238,6 +239,7 @@ public struct BrainJob<T> : IJobChunk where T : struct, IBrain
     public ComponentTypeHandle<DecisionSpeedComponent> decisionTimeLeftTypeHandle;
     public ComponentTypeHandle<EnergyComponent> energyTypeHandle;
     public ComponentTypeHandle<HealthComponent> healthTypeHandle;
+    public EntityTypeHandle entityTypeHandle;
 
     [BurstCompile]
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -251,35 +253,71 @@ public struct BrainJob<T> : IJobChunk where T : struct, IBrain
         var chunkDecision = chunk.GetNativeArray(decisionTimeLeftTypeHandle);
         var chunkEnergy = chunk.GetNativeArray(energyTypeHandle);
         var chunkHealth = chunk.GetNativeArray(healthTypeHandle);
+        var chunkEntityPtr = chunk.GetEntityDataPtrRO(entityTypeHandle);
 
+
+        //Workaround for RefRW
+        NativeArray<Entity> entities = new NativeArray<Entity>(chunk.Count, Allocator.Temp);
+        for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++, chunkEntityPtr++) 
+        {
+            //https://stackoverflow.com/questions/43859640/is-there-any-way-to-convert-intptr-void-to-ref-somestruct-in-c
+            entities[i] = *chunkEntityPtr;
+        }
+        
 
         //AtomicSafetyHandle handle = AtomicSafetyHandle.Create();
         //TargetPositionComponent* target = (TargetPositionComponent*)chunk.GetRequiredComponentDataPtrRW<TargetPositionComponent>(ref targetTypeHandle);
-        
-        
+
+
         for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)//, target++
         {
-            RefRW<TargetPositionComponent> target = new RefRW<TargetPositionComponent>(chunkTargets, i);//new RefRW<TargetPositionComponent>((byte*) target , handle);
 
-            //target.ValueRW.value = new Unity.Mathematics.float3(i, 0f, 0f);
-
-            TargetTest test = new TargetTest {};
-
-            test.SetTarget(target);
-
-            test.Move();
-
-            /*
-            T brain = new T {transform = chunkTransforms[i],
-            target = comp,
-            maxDecisionSpeed = chunkmaxDecision[i],
-            decisionTimeLeft = chunkDecision[i],
-            energy = chunkEnergy[i],
-            health = chunkHealth[i]
+            RefRW<LocalToWorldTransform> transform = new RefRW<LocalToWorldTransform>(chunkTransforms, i);
+            RefRW<TargetPositionComponent> target = new RefRW<TargetPositionComponent>(chunkTargets, i);
+            RefRW<MaxDecisionSpeedComponent> maxDecisionSpeed = new RefRW<MaxDecisionSpeedComponent>(chunkmaxDecision, i);
+            RefRW<DecisionSpeedComponent> decisionTimeLeft = new RefRW<DecisionSpeedComponent>(chunkDecision, i);
+            RefRW<EnergyComponent> energy = new RefRW<EnergyComponent>(chunkEnergy, i);
+            RefRW<HealthComponent> health = new RefRW<HealthComponent>(chunkHealth, i);
+            RefRW<Entity> entity = new RefRW<Entity>(entities,i);//new RefRW<Entity>((byte*)chunkEntityPtr, handle);
+            
+            T brain = new T {transform = transform,
+            target = target,
+            maxDecisionSpeed = maxDecisionSpeed,
+            decisionTimeLeft = decisionTimeLeft,
+            energy = energy,
+            health = health,
+            entity = entity,
             };
 
-            brain.See(deltaTime, bufferLookup, random);
 
+            decisionTimeLeft.ValueRW.value -= deltaTime;
+
+            if (decisionTimeLeft.ValueRO.value <= 0f)
+            {
+                target.ValueRW.value = transform.ValueRO.Value.Position;
+
+
+                BrainAction action = brain.See(deltaTime, bufferLookup, random, out float3 moveTo);
+                //action = BrainAction.nothing;
+                if (action == BrainAction.move)
+                {
+                    target.ValueRW.value = moveTo;
+                }
+                else if (action == BrainAction.eat)
+                {
+
+                }
+                else if (action == BrainAction.attack) 
+                {
+
+                }
+
+
+                //Reset
+                decisionTimeLeft.ValueRW.value = maxDecisionSpeed.ValueRO.value * random.ValueRW.value.NextFloat(0.01f, 1f);
+
+            }
+            /*
             //This is slow please figure out how to fix this!!!
             chunkTransforms[i] = new LocalToWorldTransform { Value = brain.transform.Value};
             //chunkTargets[i] = new TargetPositionComponent { value = new Unity.Mathematics.float3(i,0,i)}; //brain.target.value
@@ -290,8 +328,33 @@ public struct BrainJob<T> : IJobChunk where T : struct, IBrain
             chunkHealth[i] = new HealthComponent { value = brain.health.value };*/
 
         }
+        entities.Dispose();
         //AtomicSafetyHandle.Release(handle);
     }
+}
+
+
+public enum BrainAction 
+{
+    /// <summary>
+    /// Do nothing
+    /// </summary>
+    nothing,
+
+    /// <summary>
+    /// Move to the position
+    /// </summary>
+    move,
+
+    /// <summary>
+    /// Eat
+    /// </summary>
+    eat,
+
+    /// <summary>
+    /// Attack
+    /// </summary>
+    attack,
 }
 
 /// <summary>
@@ -299,13 +362,15 @@ public struct BrainJob<T> : IJobChunk where T : struct, IBrain
 /// </summary>
 public interface IBrain 
 {
-    public LocalToWorldTransform transform { get; set; }
+
+    public RefRW<Entity> entity { get; set; }
+    public RefRW<LocalToWorldTransform> transform { get; set; }
 
     public RefRW<TargetPositionComponent> target { get; set; }
-    public MaxDecisionSpeedComponent maxDecisionSpeed { get; set; }
-    public DecisionSpeedComponent decisionTimeLeft { get; set; }
-    public EnergyComponent energy { get; set; }
-    public HealthComponent health { get; set; }
+    public RefRW<MaxDecisionSpeedComponent> maxDecisionSpeed { get; set; }
+    public RefRW<DecisionSpeedComponent> decisionTimeLeft { get; set; }
+    public RefRW<EnergyComponent> energy { get; set; }
+    public RefRW<HealthComponent> health { get; set; }
 
 
     /// <summary>
@@ -314,6 +379,6 @@ public interface IBrain
     /// <param name="deltaTime"></param>
     /// <param name="bufferLookup"></param>
     /// <param name="random"></param>
-    [BurstCompile]
-    public void See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random);
+    //[BurstCompile]
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo);
 }

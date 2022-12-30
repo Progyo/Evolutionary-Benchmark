@@ -37,7 +37,7 @@ public readonly partial struct SeeRadiusAspect : IAspect
     }*/
 
     [BurstCompile]
-    public void UpdateView(NativeArray<LocalToWorldTransform> transforms, NativeArray<EntityTypeComponent> types, BufferLookup<SeeBufferComponent> bufferLookup)
+    public void UpdateView(NativeArray<LocalToWorldTransform> transforms, NativeArray<EntityTypeComponent> types, BufferLookup<SeeBufferComponent> bufferLookup, NativeArray<Entity> entities)
     {
         
         bool successful = bufferLookup.TryGetBuffer(entity, out DynamicBuffer<SeeBufferComponent> buffer);
@@ -63,7 +63,7 @@ public readonly partial struct SeeRadiusAspect : IAspect
             {
                 EntityType type = types[i].value;
                 ItemType itemType = getType(type);
-                buffer.Add(new SeeBufferComponent { distance = distance, itemType = itemType, position = pos });
+                buffer.Add(new SeeBufferComponent { distance = distance, itemType = itemType, position = pos, entity= entities[i] });
             }
 
 

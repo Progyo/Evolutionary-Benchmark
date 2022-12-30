@@ -30,4 +30,9 @@ public struct SeeBufferComponent : IBufferElementData
     /// The position of the item
     /// </summary>
     public float3 position;
+
+    /// <summary>
+    /// The entity
+    /// </summary>
+    public Entity entity;
 }
