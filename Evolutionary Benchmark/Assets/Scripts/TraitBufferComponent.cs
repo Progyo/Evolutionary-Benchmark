@@ -2,7 +2,7 @@ using Unity.Entities;
 
 [assembly: RegisterGenericComponentType(typeof(TraitBufferComponent<int>))]
 [assembly: RegisterGenericComponentType(typeof(TraitBufferComponent<float>))]
-public struct TraitBufferComponent<T> : IBufferElementData
+public struct TraitBufferComponent<T> : IBufferElementData where T: struct
 {
     /// <summary>
     /// The trait

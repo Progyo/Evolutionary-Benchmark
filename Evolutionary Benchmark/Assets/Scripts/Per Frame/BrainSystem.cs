@@ -260,16 +260,10 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
         NativeArray<Entity> entities = new NativeArray<Entity>(chunk.Count, Allocator.Temp);
         for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++, chunkEntityPtr++) 
         {
-            //https://stackoverflow.com/questions/43859640/is-there-any-way-to-convert-intptr-void-to-ref-somestruct-in-c
             entities[i] = *chunkEntityPtr;
         }
-        
 
-        //AtomicSafetyHandle handle = AtomicSafetyHandle.Create();
-        //TargetPositionComponent* target = (TargetPositionComponent*)chunk.GetRequiredComponentDataPtrRW<TargetPositionComponent>(ref targetTypeHandle);
-
-
-        for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)//, target++
+        for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)
         {
 
             RefRW<LocalToWorldTransform> transform = new RefRW<LocalToWorldTransform>(chunkTransforms, i);
@@ -278,7 +272,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
             RefRW<DecisionSpeedComponent> decisionTimeLeft = new RefRW<DecisionSpeedComponent>(chunkDecision, i);
             RefRW<EnergyComponent> energy = new RefRW<EnergyComponent>(chunkEnergy, i);
             RefRW<HealthComponent> health = new RefRW<HealthComponent>(chunkHealth, i);
-            RefRW<Entity> entity = new RefRW<Entity>(entities,i);//new RefRW<Entity>((byte*)chunkEntityPtr, handle);
+            RefRW<Entity> entity = new RefRW<Entity>(entities,i);
             
             T brain = new T {transform = transform,
             target = target,
@@ -317,19 +311,8 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 decisionTimeLeft.ValueRW.value = maxDecisionSpeed.ValueRO.value * random.ValueRW.value.NextFloat(0.01f, 1f);
 
             }
-            /*
-            //This is slow please figure out how to fix this!!!
-            chunkTransforms[i] = new LocalToWorldTransform { Value = brain.transform.Value};
-            //chunkTargets[i] = new TargetPositionComponent { value = new Unity.Mathematics.float3(i,0,i)}; //brain.target.value
-            chunkTargets[i] = brain.target.ValueRO;
-            chunkmaxDecision[i] = new MaxDecisionSpeedComponent { value = brain.maxDecisionSpeed.value};
-            chunkDecision[i] = new DecisionSpeedComponent { value = brain.decisionTimeLeft.value };
-            chunkEnergy[i] = new EnergyComponent { value = brain.energy.value};
-            chunkHealth[i] = new HealthComponent { value = brain.health.value };*/
-
         }
         entities.Dispose();
-        //AtomicSafetyHandle.Release(handle);
     }
 }
 
