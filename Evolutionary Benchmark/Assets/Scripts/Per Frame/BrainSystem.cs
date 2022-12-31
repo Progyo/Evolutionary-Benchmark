@@ -33,6 +33,8 @@ public partial struct BrainSystem : ISystem
     ComponentTypeHandle<DecisionSpeedComponent> _decisionTimeLeftTypeHandle;
     ComponentTypeHandle<EnergyComponent> _energyTypeHandle;
     ComponentTypeHandle<HealthComponent> _healthTypeHandle;
+    ComponentTypeHandle<MaxEnergyComponent> _maxEnergyTypeHandle;
+    ComponentTypeHandle<MaxHealthComponent> _maxHealthTypeHandle;
     EntityTypeHandle _entityTypeHandle;
 
     [BurstCompile]
@@ -63,6 +65,8 @@ public partial struct BrainSystem : ISystem
         _decisionTimeLeftTypeHandle = state.GetComponentTypeHandle<DecisionSpeedComponent>();
         _energyTypeHandle = state.GetComponentTypeHandle<EnergyComponent>();
         _healthTypeHandle = state.GetComponentTypeHandle<HealthComponent>();
+        _maxEnergyTypeHandle = state.GetComponentTypeHandle<MaxEnergyComponent>();
+        _maxHealthTypeHandle = state.GetComponentTypeHandle<MaxHealthComponent>();
         _entityTypeHandle = state.GetEntityTypeHandle();
     }
 
@@ -93,7 +97,13 @@ public partial struct BrainSystem : ISystem
             _decisionTimeLeftTypeHandle.Update(ref state);
             _energyTypeHandle.Update(ref state);
             _healthTypeHandle.Update(ref state);
+            _maxEnergyTypeHandle.Update(ref state);
+            _maxHealthTypeHandle.Update(ref state);
             _entityTypeHandle.Update(ref state);
+
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+
+            EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();
 
             //NativeArray<LocalToWorldTransform> transforms = _brainQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
 
@@ -107,10 +117,15 @@ public partial struct BrainSystem : ISystem
                 decisionTimeLeftTypeHandle = _decisionTimeLeftTypeHandle,
                 energyTypeHandle = _energyTypeHandle,
                 healthTypeHandle = _healthTypeHandle,
-                entityTypeHandle = _entityTypeHandle
+                entityTypeHandle = _entityTypeHandle,
+                maxEnergyTypeHandle = _maxEnergyTypeHandle,
+                maxHealthTypeHandle = _maxHealthTypeHandle,
+                ecb = ecbParallel
             }.ScheduleParallel(_brainQuery, state.Dependency);
             handle.Complete();
 
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
             //transforms.Dispose();
         }
     }
@@ -239,7 +254,11 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
     public ComponentTypeHandle<DecisionSpeedComponent> decisionTimeLeftTypeHandle;
     public ComponentTypeHandle<EnergyComponent> energyTypeHandle;
     public ComponentTypeHandle<HealthComponent> healthTypeHandle;
+    public ComponentTypeHandle<MaxEnergyComponent> maxEnergyTypeHandle;
+    public ComponentTypeHandle<MaxHealthComponent> maxHealthTypeHandle;
     public EntityTypeHandle entityTypeHandle;
+
+    public EntityCommandBuffer.ParallelWriter ecb;
 
     [BurstCompile]
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -253,15 +272,19 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
         var chunkDecision = chunk.GetNativeArray(decisionTimeLeftTypeHandle);
         var chunkEnergy = chunk.GetNativeArray(energyTypeHandle);
         var chunkHealth = chunk.GetNativeArray(healthTypeHandle);
-        var chunkEntityPtr = chunk.GetEntityDataPtrRO(entityTypeHandle);
+        var chunkMaxEnergy = chunk.GetNativeArray(maxEnergyTypeHandle);
+        var chunkMaxHealth = chunk.GetNativeArray(maxHealthTypeHandle);
+
+        //var chunkEntityPtr = chunk.GetEntityDataPtrRO(entityTypeHandle);
+        //chunk.GetNativeArray
 
 
         //Workaround for RefRW
-        NativeArray<Entity> entities = new NativeArray<Entity>(chunk.Count, Allocator.Temp);
-        for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++, chunkEntityPtr++) 
+        NativeArray<Entity> entities = chunk.GetNativeArray(entityTypeHandle);//new NativeArray<Entity>(chunk.Count, Allocator.Temp);
+        /*for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++, chunkEntityPtr++) 
         {
             entities[i] = *chunkEntityPtr;
-        }
+        }*/
 
         for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)
         {
@@ -272,6 +295,8 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
             RefRW<DecisionSpeedComponent> decisionTimeLeft = new RefRW<DecisionSpeedComponent>(chunkDecision, i);
             RefRW<EnergyComponent> energy = new RefRW<EnergyComponent>(chunkEnergy, i);
             RefRW<HealthComponent> health = new RefRW<HealthComponent>(chunkHealth, i);
+            RefRW<MaxEnergyComponent> maxEnergy = new RefRW<MaxEnergyComponent>(chunkMaxEnergy, i);
+            RefRW<MaxHealthComponent> maxHealth = new RefRW<MaxHealthComponent>(chunkMaxHealth, i);
             RefRW<Entity> entity = new RefRW<Entity>(entities,i);
             
             T brain = new T {transform = transform,
@@ -291,7 +316,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 target.ValueRW.value = transform.ValueRO.Value.Position;
 
 
-                BrainAction action = brain.See(deltaTime, bufferLookup, random, out float3 moveTo);
+                BrainAction action = brain.See(deltaTime, bufferLookup, random, out float3 moveTo, out Entity entityToConsume);
                 //action = BrainAction.nothing;
                 if (action == BrainAction.move)
                 {
@@ -300,6 +325,10 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 else if (action == BrainAction.eat)
                 {
 
+                    ecb.AddComponent<EatenByComponent>(i, entityToConsume, new EatenByComponent { eatenBy = entity,
+                        nurishment = 10f, energy =energy,
+                        health= health, maxEnergy = maxEnergy,
+                        maxHealth = maxHealth});
                 }
                 else if (action == BrainAction.attack) 
                 {
@@ -313,6 +342,15 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
             }
         }
         entities.Dispose();
+
+        chunkTransforms.Dispose();
+        chunkTargets.Dispose();
+        chunkDecision.Dispose();
+        chunkmaxDecision.Dispose();
+        chunkEnergy.Dispose();
+        chunkHealth.Dispose();
+        chunkMaxEnergy.Dispose();
+        chunkMaxHealth.Dispose();
     }
 }
 
@@ -363,5 +401,5 @@ public interface IBrain
     /// <param name="bufferLookup"></param>
     /// <param name="random"></param>
     //[BurstCompile]
-    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo);
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume);
 }

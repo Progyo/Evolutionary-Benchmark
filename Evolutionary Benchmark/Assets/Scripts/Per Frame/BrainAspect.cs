@@ -114,12 +114,14 @@ public struct BrainTest :  IBrain
 
 
     [BurstCompile]
-    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo)
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume)
     {
 
         float max = 10f;
         float min = -max;
         moveTo = transform.ValueRO.Value.Position;
+
+        entityToConsume = _entity.ValueRO;
 
         bool successful = bufferLookup.TryGetBuffer(_entity.ValueRO, out DynamicBuffer<SeeBufferComponent> buffer);
 
@@ -132,7 +134,6 @@ public struct BrainTest :  IBrain
         float closestDistance = 1000f;
         float3 closestPos = _transform.ValueRO.Value.Position;
         bool foodFound = false;
-
         if (!buffer.IsEmpty)
         {
             for (int i = 0; i < buffer.Length; i++)
@@ -142,6 +143,13 @@ public struct BrainTest :  IBrain
                     closestDistance = buffer[i].distance;
                     closestPos = buffer[i].position;
                     foodFound |= true;
+
+                    if (foodFound && closestDistance < 0.5f)
+                    {
+                        entityToConsume = buffer[i].entity;
+                        return BrainAction.eat;
+                    }
+                    
                 }
             }
         }
@@ -150,6 +158,7 @@ public struct BrainTest :  IBrain
         {
             closestPos += new float3(random.ValueRW.value.NextFloat(min, max), 0f, random.ValueRW.value.NextFloat(min, max));
         }
+
 
         //_target.ValueRW.value = closestPos;
         moveTo = closestPos;

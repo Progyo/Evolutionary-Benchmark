@@ -64,6 +64,9 @@ public readonly partial struct SeeRadiusAspect : IAspect
             {
                 EntityType type = types[i].value;
                 ItemType itemType = getType(type);
+
+                //RefRW<Entity> ent = new RefRW<Entity>(entities, i);
+
                 buffer.Add(new SeeBufferComponent { distance = distance, itemType = itemType, position = pos, entity= entities[i] });
             }
 
