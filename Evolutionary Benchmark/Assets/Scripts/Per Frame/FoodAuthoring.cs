@@ -15,6 +15,7 @@ public class FoodBaker : Baker<FoodAuthoring>
     public override void Bake(FoodAuthoring authoring)
     {
         AddComponent<EntityTypeComponent>(new EntityTypeComponent { value = EntityType.food });
+        AddComponent<FoodComponent>(new FoodComponent { value = authoring.nurishment });
     }
 }
 

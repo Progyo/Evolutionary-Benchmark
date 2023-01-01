@@ -17,21 +17,26 @@ public readonly partial struct EatAspect : IAspect
         float energyToAdd = 0f;
         float healthToAdd = 0f;
         //Prioritize energy regen
-        
-        /*
-        if (eaten.ValueRW.maxEnergy.ValueRW.value < eaten.ValueRW.energy.ValueRW.value + eaten.ValueRW.nurishment)
+
+        float maxEnergy = 10f; //eaten.ValueRW.maxEnergy.ValueRW.value
+        float energy = 5f;//eaten.ValueRW.energy.ValueRO.value;
+        float nurishment = 0f;//eaten.ValueRW.nurishment;
+        float health = eaten.ValueRO.health.ValueRO.value;
+
+
+        if ( maxEnergy < energy + nurishment)
         {
-            energyToAdd = eaten.ValueRW.maxEnergy.ValueRW.value - eaten.ValueRW.energy.ValueRW.value;
-            healthToAdd = eaten.ValueRW.nurishment - energyToAdd;
+            energyToAdd = maxEnergy - energy;
+            healthToAdd =  nurishment - energyToAdd;
         }
-        else if (eaten.ValueRW.energy.ValueRW.value < eaten.ValueRW.maxEnergy.ValueRW.value)
+        else if (energy < maxEnergy)
         {
-            energyToAdd = eaten.ValueRW.nurishment;
+            energyToAdd = nurishment;
         }
         
-        eaten.ValueRW.energy.ValueRW.value += energyToAdd;
-        eaten.ValueRW.health.ValueRW.value += healthToAdd;
-        */
+        eaten.ValueRW.energy.ValueRW.value = energy + energyToAdd;
+        eaten.ValueRW.health.ValueRW.value = health + healthToAdd;
+        
         ecb.DestroyEntity(sortKey, entity);
 
     }

@@ -5,7 +5,7 @@ using Unity.Burst;
 using Unity.Collections;
 
 [BurstCompile]
-[UpdateAfter(typeof(InputSystem))]
+[UpdateAfter(typeof(BrainSystem))]
 //[CreateAfter(typeof(EpochTimer))]
 public partial struct ControlSystem : ISystem
 {

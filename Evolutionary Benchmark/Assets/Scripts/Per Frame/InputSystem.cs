@@ -7,16 +7,24 @@ using Unity.Jobs;
 using Unity.Transforms;
 
 
-[UpdateAfter(typeof(EpochTimer))]
+[UpdateAfter(typeof(MutationSystem))]
 public partial class InputSystem : SystemBase
 {
+    BufferLookup<SeeBufferComponent> _seeBufferLookup;
+    EntityQuery _SeeQuery;
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        RequireForUpdate<SimStateComponent>();
+        _seeBufferLookup = GetBufferLookup<SeeBufferComponent>(false);
+        _SeeQuery = EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
+    }
+
     protected override void OnUpdate()
     {
-        RequireForUpdate<SimStateComponent>();
-        BufferLookup<SeeBufferComponent>  _seeBufferLookup = GetBufferLookup<SeeBufferComponent>(false);
 
 
-        EntityQuery _SeeQuery = EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
+         
             
         //new EntityQueryBuilder(Allocator.Temp)
         //.WithAllRW<LocalToWorldTransform>()

@@ -10,10 +10,10 @@ public partial class EpochTimer : SystemBase
 
 
 
-        if (state.ValueRO.phase == Phase.start)
+        /*if (state.ValueRO.phase == Phase.start)
         {
             state.ValueRW.phase = Phase.running;
-        }
+        }*/
 
 
         if (state.ValueRO.currentEpoch > state.ValueRO.maxEpochs) 
@@ -29,10 +29,10 @@ public partial class EpochTimer : SystemBase
             state.ValueRW.currentEpoch++;
             state.ValueRW.timeElapsed = 0f;
         }
-        else if (state.ValueRO.timeElapsed > 0 && state.ValueRO.timeElapsed <= state.ValueRO.epochDuration && state.ValueRO.phase != Phase.stop && state.ValueRO.phase != Phase.end) 
+        /*else if (state.ValueRO.timeElapsed > 0 && state.ValueRO.timeElapsed <= state.ValueRO.epochDuration && state.ValueRO.phase != Phase.stop && state.ValueRO.phase != Phase.end) 
         {
             state.ValueRW.phase = Phase.running;
-        }
+        }*/
 
 
         //Start phase

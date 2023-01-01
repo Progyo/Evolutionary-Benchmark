@@ -42,11 +42,16 @@ public partial struct BrainSystem : ISystem
     {
         state.RequireForUpdate<SimStateComponent>();
 
-        _targetQuery = new EntityQueryBuilder(Allocator.Temp)
-        .WithAllRW<TargetPositionComponent>()
-        .Build(ref state);
-
         var builder = new EntityQueryBuilder(Allocator.Temp)
+        .WithAllRW<TargetPositionComponent>();
+
+
+        _targetQuery = state.GetEntityQuery(builder);
+
+
+        builder.Dispose();
+
+        builder = new EntityQueryBuilder(Allocator.Temp)
          .WithAllRW<LocalToWorldTransform, TargetPositionComponent>()
          .AddAdditionalQuery().
          WithAllRW<MaxDecisionSpeedComponent, DecisionSpeedComponent>()
@@ -68,6 +73,9 @@ public partial struct BrainSystem : ISystem
         _maxEnergyTypeHandle = state.GetComponentTypeHandle<MaxEnergyComponent>();
         _maxHealthTypeHandle = state.GetComponentTypeHandle<MaxHealthComponent>();
         _entityTypeHandle = state.GetEntityTypeHandle();
+
+
+        builder.Dispose();
     }
 
     [BurstCompile]
@@ -324,11 +332,16 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 }
                 else if (action == BrainAction.eat)
                 {
+                    var tempEntity = new RefStruct<Entity>(entities, i);
+                    var tempEnergy = new RefStruct<EnergyComponent>(chunkEnergy, i);
+                    var tempHealth = new RefStruct<HealthComponent>(chunkHealth, i);
+                    var tempMaxEnergy = new RefStruct<MaxEnergyComponent>(chunkMaxEnergy, i);
+                    var tempMaxHealth = new RefStruct<MaxHealthComponent>(chunkMaxHealth, i);
 
-                    ecb.AddComponent<EatenByComponent>(i, entityToConsume, new EatenByComponent { eatenBy = entity,
-                        nurishment = 10f, energy =energy,
-                        health= health, maxEnergy = maxEnergy,
-                        maxHealth = maxHealth});
+                    ecb.AddComponent<EatenByComponent>(i, entityToConsume, new EatenByComponent { eatenBy = tempEntity,
+                        /*nurishment = 10f,*/ energy =tempEnergy,
+                        health= tempHealth, maxEnergy = tempMaxEnergy,
+                        maxHealth = tempMaxHealth});
                 }
                 else if (action == BrainAction.attack) 
                 {

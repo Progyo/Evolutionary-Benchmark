@@ -507,7 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e755022a40a8a604caadb14fca4ff54f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nurishment: 1
+  nurishment: 10
 --- !u!1 &1010495384
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e755022a40a8a604caadb14fca4ff54f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nurishment: 1
+  nurishment: 10
 --- !u!4 &1315538727
 Transform:
   m_ObjectHideFlags: 0
@@ -770,7 +770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e755022a40a8a604caadb14fca4ff54f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nurishment: 1
+  nurishment: 10
 --- !u!4 &1956217051
 Transform:
   m_ObjectHideFlags: 0

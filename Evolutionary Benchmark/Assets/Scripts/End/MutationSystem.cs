@@ -1,3 +1,4 @@
+using AOT;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,15 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.VisualScripting;
+
+//using System.Runtime.InteropServices;
 
 
 [assembly: RegisterGenericJobType(typeof(MutateJob<TestFloatMutationAlgorithm,TestIntMutationAlgorithm>))]
 
 [BurstCompile]
-[UpdateAfter(typeof(ControlSystem))]
+[UpdateAfter(typeof(SpawnerSystem))]
 public partial struct MutationSystem : ISystem
 {
 
@@ -39,6 +43,8 @@ public partial struct MutationSystem : ISystem
 
         _entityTypeHandle = state.GetEntityTypeHandle();
 
+        builder.Dispose();
+
     }
 
     [BurstCompile]
@@ -52,7 +58,7 @@ public partial struct MutationSystem : ISystem
     {
         RefRW<SimStateComponent> simState = SystemAPI.GetSingletonRW<SimStateComponent>();
 
-        if ( simState.ValueRO.phase == Phase.end)
+        if ( simState.ValueRO.phase == Phase.start)
         {
             RefRW<RandomComponent> random = SystemAPI.GetSingletonRW<RandomComponent>();
             
@@ -70,11 +76,25 @@ public partial struct MutationSystem : ISystem
 
             handle.Complete();
 
+            
+            simState.ValueRW.phase = Phase.running;
 
-            simState.ValueRW.phase = Phase.evaluated;
+            LogMetric(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, ref state);
         }
     }
+    [BurstCompile]
+    private void LogMetric(float timeStamp, int epoch, ref SystemState state) 
+    {
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+        Entity entity = ecb.CreateEntity();
+        ecb.AddComponent(entity, new MetricComponent<int> { value = 420, timeStamp = timeStamp, epoch = epoch, type= MetricType.mutation });
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
 }
+
+
+
 
 [BurstCompile]
 public unsafe struct MutateJob<floatAlg,intAlg> : IJobChunk where floatAlg : struct, IMutateFloatAlgorithm where intAlg: struct, IMutateIntAlgorithm
