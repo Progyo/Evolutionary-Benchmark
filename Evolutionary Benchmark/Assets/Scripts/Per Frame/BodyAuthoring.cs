@@ -50,8 +50,8 @@ public class BodyBaker : Baker<BodyAuthoring>
         AddComponent<FitnessComponent>(new FitnessComponent { value = 0f });
 
         AddBuffer<TraitBufferComponent<float>>();
-        AppendToBuffer<TraitBufferComponent<float>>(new TraitBufferComponent<float> { traitType = TraitType.speed, value = authoring.speed });
+        AppendToBuffer<TraitBufferComponent<float>>(new TraitBufferComponent<float> { traitType = TraitType.speed, value = authoring.speed, maxValue = 100f, minValue = 0f });
         AddBuffer<TraitBufferComponent<int>>();
-        AppendToBuffer<TraitBufferComponent<int>>(new TraitBufferComponent<int> { traitType = TraitType.size, value = authoring.size });
+        AppendToBuffer<TraitBufferComponent<int>>(new TraitBufferComponent<int> { traitType = TraitType.size, value = authoring.size, maxValue = 100, minValue = 1 });
     }
 }

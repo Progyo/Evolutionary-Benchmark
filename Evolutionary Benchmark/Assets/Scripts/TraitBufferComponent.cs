@@ -13,4 +13,14 @@ public struct TraitBufferComponent<T> : IBufferElementData where T: struct
     /// That value of the trait
     /// </summary>
     public T value;
+
+    /// <summary>
+    /// The minimum value of this trait
+    /// </summary>
+    public T minValue;
+
+    /// <summary>
+    /// The maximum value of this trait
+    /// </summary>
+    public T maxValue;
 }

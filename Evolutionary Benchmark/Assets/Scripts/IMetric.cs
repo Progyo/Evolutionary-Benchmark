@@ -18,11 +18,38 @@ public delegate int Process2StringDelegate();
 */
 
 [assembly: RegisterGenericComponentTypeAttribute(typeof(MetricComponent<int>))]
-
+[assembly: RegisterGenericComponentTypeAttribute(typeof(MetricComponent<float>))]
 
 public enum MetricType 
 {
+
     mutation,
+    
+    /// <summary>
+    /// Fitness metric
+    /// </summary>
+    fitness,
+}
+
+/// <summary>
+/// Struct that defines how fitness metric is serialized to json
+/// </summary>
+public struct FitnessMetric : IMetric
+{
+    public float averageFitness;
+    public float maxFitness;
+    public float metricCount;
+
+    public string ToJsonString()
+    {
+        return "'fitness' : {'average': "+averageFitness+", 'max': "+maxFitness+"}";
+    }
+}
+
+
+public interface IMetric
+{
+    public string ToJsonString();
 }
 
 public struct MetricComponent<T> : IComponentData where T: struct 

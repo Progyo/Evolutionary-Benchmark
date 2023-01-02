@@ -115,7 +115,9 @@ public partial struct EvaluationSystem : ISystem
                 maxEnergyTypeHandle = _maxEnergyTypeHandle,
                 maxHealthTypeHandle = _maxHealthTypeHandle,
                 entityTypeTypeHandle = _entityTypeTypeHandle,
-                ecb = ecbParallel
+                ecb = ecbParallel,
+                epoch = simState.ValueRO.currentEpoch,
+                timeElapsed = simState.ValueRO.timeElapsed,
             }.ScheduleParallel(_evaluateQuery, state.Dependency);
             //simState.ValueRW.phase = Phase.evaluated;
 
@@ -167,6 +169,13 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
 
     public EntityCommandBuffer.ParallelWriter ecb;
 
+
+    [ReadOnly]
+    public int epoch;
+
+    [ReadOnly]
+    public float timeElapsed;
+
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
     {
         Assert.IsFalse(useEnabledMask);
@@ -205,21 +214,6 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
                 RefRW<MaxHealthComponent> maxHealth = new RefRW<MaxHealthComponent>(chunkMaxHealth, i);
                 RefRW<Entity> entity = new RefRW<Entity>(entities, i);
 
-                /*EvalFunc evalFunc = new EvalFunc
-                {
-                    transform = transform,
-                    target = target,
-                    maxDecisionSpeed = maxDecisionSpeed,
-                    decisionTimeLeft = decisionTimeLeft,
-                    energy = energy,
-                    maxEnergy= maxEnergy,
-                    health = health,
-                    maxHealth = maxHealth,
-                    entity = entity,
-                    floatLookup = floatBufferLookup,
-                    intLookup = intBufferLookup,
-                };*/
-
                 evalFunc.transform = transform;
                 evalFunc.target = target;
                 evalFunc.maxDecisionSpeed = maxDecisionSpeed;
@@ -233,6 +227,21 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
                 float fitness = evalFunc.Evaluate();
 
                 ecb.SetComponent<FitnessComponent>(i, entity.ValueRO, new FitnessComponent { value = fitness });
+
+                /*
+                if(fitness == 0) 
+                {
+                    ecb.AddComponent<DestroyComponent>(i, entity.ValueRO);
+                }*/
+                
+
+                Entity e  = ecb.CreateEntity(i + chunkEntityCount);
+
+                ecb.AddComponent<MetricComponent<float>>(i + 2 * chunkEntityCount, e,
+                    new MetricComponent<float> {epoch = epoch,
+                        timeStamp = timeElapsed,
+                        type = MetricType.fitness,
+                        value = fitness});
             }
         }
 

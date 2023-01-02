@@ -633,7 +633,7 @@ MonoBehaviour:
   epochDuration: 10
   currentEpoch: 0
   maxEpochs: 10
-  maxEntities: 100
+  maxEntities: 10
   seed: 10
   prefab: {fileID: 8219850041221293206, guid: 29f753f9d8356184791965170bfe6df3, type: 3}
 --- !u!4 &1384976299

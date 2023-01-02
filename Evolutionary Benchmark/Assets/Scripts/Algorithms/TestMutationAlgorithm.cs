@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Assertions;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 [BurstCompile]
@@ -18,7 +19,7 @@ public struct TestFloatMutationAlgorithm : IMutateFloatAlgorithm
     [BurstCompile]
     public void Mutate(ref TraitBufferComponent<float> trait, RefRW<RandomComponent> random)
     {
-        trait.value += random.ValueRW.value.NextFloat(-5f, 5f);
+        trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextFloat(-5f, 5f),trait.minValue),trait.maxValue);
     }
 
 }
@@ -36,7 +37,7 @@ public struct TestIntMutationAlgorithm : IMutateIntAlgorithm
     [BurstCompile]
     public void Mutate(ref TraitBufferComponent<int> trait, RefRW<RandomComponent> random)
     {
-        trait.value += random.ValueRW.value.NextInt(-5, 5);
+        trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextInt(-5, 5),trait.minValue),trait.maxValue);
     }
 
 }
