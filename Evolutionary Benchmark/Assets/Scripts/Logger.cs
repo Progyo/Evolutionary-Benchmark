@@ -38,7 +38,7 @@ public static class Logger
         return "";
     }
 }*/
-[UpdateAfter(typeof(ConsumeSystem))]
+[UpdateAfter(typeof(EvaluationSystem))]
 public partial class LoggerSystem : SystemBase
 {
     string json = "";

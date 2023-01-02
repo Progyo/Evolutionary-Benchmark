@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.UniversalDelegates;
 using Unity.Transforms;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -26,6 +27,21 @@ public partial class DestroyerSystem : SystemBase
             BufferLookup<Child> lookup = GetBufferLookup<Child>();
 
             //https://docs.unity3d.com/Packages/com.unity.entities@0.0/manual/entity_iteration_foreach.html
+
+
+            //Remove this later
+            /*if(simState.ValueRO.phase == Phase.end) 
+            {
+                Entities.WithAll<EntityTypeComponent>().ForEach((Entity entity) =>
+                {
+
+                    ecb.AddComponent<DestroyComponent>(entity);
+                    noChildren = false;
+
+                }).Run();
+                
+            }
+            */
 
             Entities.WithAll<DestroyComponent>().ForEach((Entity entity) =>
             {

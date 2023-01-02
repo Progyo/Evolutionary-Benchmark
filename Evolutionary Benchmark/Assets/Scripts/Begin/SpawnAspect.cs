@@ -29,6 +29,7 @@ public readonly partial struct SpawnAspect : IAspect
             Entity e = ecb.Instantiate(sortKey, entity);
             //ecb.SetComponent<SpeedComponent>(sortKey, e, new SpeedComponent { value = spawnPoint.ValueRW.random.NextFloat(1f, 20f) });
             ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
+            ecb.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos });
         }
 
 

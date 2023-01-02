@@ -6,7 +6,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
-
+using Unity.Mathematics;
 
 [BurstCompile]
 [UpdateAfter(typeof(ControlSystem))]
@@ -133,13 +133,14 @@ public struct EatJob : IJobChunk
 
         var test = eaten[index].maxEnergy;
 
-        float maxEnergy = test.ValueRW.value;
+        float maxEnergy = test.ValueRO.value;
+        float maxHealth = test.ValueRO.value;
         float energy = eaten[index].energy.ValueRO.value;
         float nurishment = food[index].value;
         float health = eaten[index].health.ValueRO.value;
 
 
-        if (maxEnergy < energy + nurishment)
+        if (maxEnergy <= energy + nurishment)
         {
             energyToAdd = maxEnergy - energy;
             healthToAdd = nurishment - energyToAdd;
@@ -150,7 +151,7 @@ public struct EatJob : IJobChunk
         }
 
         eaten[index].energy.ValueRW.value = energy + energyToAdd;
-        eaten[index].health.ValueRW.value = health + healthToAdd;
+        eaten[index].health.ValueRW.value = math.min(health + healthToAdd, maxHealth);
 
         /*bool success = children.TryGetBuffer(entities[index], out DynamicBuffer<Child> buffer);
 

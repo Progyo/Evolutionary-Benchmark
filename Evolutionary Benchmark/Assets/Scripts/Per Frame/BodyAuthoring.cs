@@ -47,7 +47,7 @@ public class BodyBaker : Baker<BodyAuthoring>
         AddComponent<MaxDecisionSpeedComponent>(new MaxDecisionSpeedComponent { value = authoring.maxDecisionSpeed });
         AddComponent<DecisionSpeedComponent>(new DecisionSpeedComponent { value = authoring.maxDecisionSpeed });
 
-
+        AddComponent<FitnessComponent>(new FitnessComponent { value = 0f });
 
         AddBuffer<TraitBufferComponent<float>>();
         AppendToBuffer<TraitBufferComponent<float>>(new TraitBufferComponent<float> { traitType = TraitType.speed, value = authoring.speed });
