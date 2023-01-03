@@ -39,7 +39,7 @@ public static string SaveJson()
 return "";
 }
 }*/
-[UpdateAfter(typeof(EvaluationSystem))]
+[UpdateAfter(typeof(SelectionSystem))]
 public partial class LoggerSystem : SystemBase
 {
     string json = "";
@@ -50,7 +50,7 @@ public partial class LoggerSystem : SystemBase
         foreach (var (simState, ent) in SystemAPI.Query<RefRW<SimStateComponent>>().WithEntityAccess()) 
         {
             bool fitness = false;
-            FitnessMetric fitnessMetric = new FitnessMetric {averageFitness = 0f, metricCount =0, maxFitness =0f };
+            //AverageAndMaxFitnessMetric fitnessMetric = new FitnessMetric {averageFitness = 0f, metricCount =0, maxFitness =0f };
 
             if (simState.ValueRO.phase == Phase.end)
             {
@@ -69,13 +69,13 @@ public partial class LoggerSystem : SystemBase
                     if (metric.ValueRO.type == MetricType.fitness)
                     {
                         fitness = true;
-                        if (metric.ValueRO.value > fitnessMetric.maxFitness) 
+                        /*if (metric.ValueRO.value > fitnessMetric.maxFitness) 
                         {
                             fitnessMetric.maxFitness = metric.ValueRO.value;
                         }
 
                         fitnessMetric.averageFitness += metric.ValueRO.value;
-                        fitnessMetric.metricCount++;
+                        fitnessMetric.metricCount++;*/
                     }
                     else 
                     {
@@ -86,13 +86,13 @@ public partial class LoggerSystem : SystemBase
                     ecb.RemoveComponent(entity, typeof(MetricComponent<float>));
                     ecb.AddComponent<DestroyComponent>(entity);
                 }
-                fitnessMetric.averageFitness /= math.max(fitnessMetric.metricCount, 1);
+                //fitnessMetric.averageFitness /= math.max(fitnessMetric.metricCount, 1);
 
 
                 if (fitness) 
                 {
                     //Logger.LogTimeAndEpoch(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, fitnessMetric);
-                    Logger.LogEpoch(simState.ValueRO.currentEpoch, fitnessMetric);
+                    //Logger.LogEpoch(simState.ValueRO.currentEpoch, fitnessMetric);
                 }
 
                 Debug.Log(Logger.SaveJson());

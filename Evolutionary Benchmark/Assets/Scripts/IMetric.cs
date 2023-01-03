@@ -26,15 +26,20 @@ public enum MetricType
     mutation,
     
     /// <summary>
-    /// Fitness metric
+    /// Fitness metric for a single entity
     /// </summary>
     fitness,
+
+    /// <summary>
+    /// The average and max fitness of an epoch
+    /// </summary>
+    averageMaxFitness,
 }
 
 /// <summary>
 /// Struct that defines how fitness metric is serialized to json
 /// </summary>
-public struct FitnessMetric : IMetric
+public struct AverageAndMaxFitnessMetric : IMetric
 {
     public float averageFitness;
     public float maxFitness;

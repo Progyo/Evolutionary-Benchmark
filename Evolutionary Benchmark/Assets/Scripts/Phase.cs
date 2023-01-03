@@ -24,5 +24,10 @@ public enum Phase
     /// <summary>
     /// End of epoch evaluated
     /// </summary>
-    evaluated
+    evaluated,
+
+    /// <summary>
+    /// Objects being deleted at the end of epoch 
+    /// </summary>
+    deleting,
 }

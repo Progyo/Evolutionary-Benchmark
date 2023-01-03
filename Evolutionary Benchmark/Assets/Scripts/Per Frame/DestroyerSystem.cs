@@ -7,6 +7,7 @@ using Unity.Transforms;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
+[UpdateAfter(typeof(LoggerSystem))]
 public partial class DestroyerSystem : SystemBase
 {
 
@@ -20,7 +21,7 @@ public partial class DestroyerSystem : SystemBase
     protected override void OnUpdate()
     {
         EntityCommandBuffer ecb = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
-
+        EntityCommandBuffer ecb2 = new EntityCommandBuffer(Allocator.Temp);
         foreach (var (simState, ent) in SystemAPI.Query<RefRW<SimStateComponent>>().WithEntityAccess())
         {
             bool noChildren = true;
@@ -43,6 +44,36 @@ public partial class DestroyerSystem : SystemBase
             }
             */
 
+            if(simState.ValueRO.phase == Phase.end) 
+            {
+                
+                Entities.WithAll<EntityTypeComponent>().WithNone<KeepComponent>().ForEach((Entity entity) =>
+                {
+                    ecb2.AddComponent<DestroyComponent>(entity);
+                }).Run();
+
+                Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
+                {
+                    ecb2.RemoveComponent<KeepComponent>(entity);
+                }).Run();
+
+
+                ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
+                {
+                    currentEpoch = simState.ValueRO.currentEpoch,
+                    maxEntities = simState.ValueRO.maxEntities,
+                    maxEpochs = simState.ValueRO.maxEpochs,
+                    entityPrefab = simState.ValueRO.entityPrefab,
+                    epochDuration = simState.ValueRO.epochDuration,
+                    phase = Phase.deleting,
+                    timeElapsed = simState.ValueRO.timeElapsed
+                });
+
+
+            }
+
+
+
             Entities.WithAll<DestroyComponent>().ForEach((Entity entity) =>
             {
                 bool success = lookup.TryGetBuffer(entity, out DynamicBuffer<Child> buffer);
@@ -61,7 +92,7 @@ public partial class DestroyerSystem : SystemBase
                 ecb.DestroyEntity(entity);
             }).Run();
 
-            if (simState.ValueRO.phase == Phase.end && noChildren)
+            if (simState.ValueRO.phase == Phase.deleting && noChildren)
             {
                 ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
                 {
@@ -77,5 +108,8 @@ public partial class DestroyerSystem : SystemBase
 
             break;
         }
+
+        ecb2.Playback(EntityManager);
+        ecb2.Dispose();
     }
 }
