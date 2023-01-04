@@ -41,6 +41,17 @@ public class SimStateAuthoring : MonoBehaviour
     public uint seed;
 
     public GameObject prefab;
+
+
+    /// <summary>
+    /// The number of fields where entities can spawn on (Also the number of spawners)
+    /// </summary>
+    public int fields;
+
+    /// <summary>
+    /// The maximum amount to keep alive for the next generation. Range between 0 and 1
+    /// </summary>
+    public float survivePercent;
 }
 
 
@@ -54,7 +65,10 @@ public class SimStateBaker : Baker<SimStateAuthoring>
             currentEpoch = authoring.currentEpoch,
             maxEpochs = authoring.maxEpochs,
             maxEntities = authoring.maxEntities,
-            entityPrefab = GetEntity(authoring.prefab)
+            entityPrefab = GetEntity(authoring.prefab),
+            fields = authoring.fields,
+            survivePercent = authoring.survivePercent,
+            killedThisGen = authoring.maxEntities
         });
 
         AddComponent(new RandomComponent { value = new Unity.Mathematics.Random(authoring.seed) });

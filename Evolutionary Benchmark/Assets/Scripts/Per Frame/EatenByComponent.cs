@@ -74,3 +74,57 @@ public struct RefStruct<T> : IQueryTypeParameter where T : struct
     }
 
 }
+
+
+public struct RefRef<T> : IQueryTypeParameter where T : struct
+{
+    private unsafe readonly byte* _Data;
+
+    public unsafe bool IsValid => _Data != null;
+
+    public unsafe ref T ValueRW
+    {
+        get
+        {
+            return ref UnsafeUtility.AsRef<T>(_Data);
+        }
+    }
+
+    public unsafe ref readonly T ValueRO
+    {
+        get
+        {
+            return ref UnsafeUtility.AsRef<T>(_Data);
+        }
+    }
+
+    [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
+    [Conditional("UNITY_DOTS_DEBUG")]
+    private void OutOfBoundsArrayConstructor(int index, int length)
+    {
+        if (index < 0 || index >= length)
+        {
+            throw new ArgumentOutOfRangeException("index is out of bounds of NativeArray<>.Length.");
+        }
+    }
+
+
+    public unsafe RefRef(ref T value) 
+    {
+        _Data = (byte*)UnsafeUtility.AddressOf<T>(ref value);
+    }
+
+    public unsafe RefRef(NativeArray<T> componentDataNativeArray, int index)
+    {
+        _Data = (byte*)NativeArrayUnsafeUtility.GetUnsafeBufferPointerWithoutChecks(componentDataNativeArray);
+        _Data += UnsafeUtility.SizeOf<T>() * index;
+        //NativeArrayUnsafeUtility.GetAtomicSafetyHandle(componentDataNativeArray);
+        OutOfBoundsArrayConstructor(index, componentDataNativeArray.Length);
+    }
+
+    public static RefRef<T> Optional(NativeArray<T> componentDataNativeArray, int index)
+    {
+        return (componentDataNativeArray.Length == 0) ? default(RefRef<T>) : new RefRef<T>(componentDataNativeArray, index);
+    }
+
+}

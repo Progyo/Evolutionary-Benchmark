@@ -42,7 +42,7 @@ return "";
 [UpdateAfter(typeof(SelectionSystem))]
 public partial class LoggerSystem : SystemBase
 {
-    string json = "";
+    //string json = "";
     protected override void OnUpdate()
     {
         //RequireForUpdate<SimStateComponent>();
@@ -54,11 +54,17 @@ public partial class LoggerSystem : SystemBase
 
             if (simState.ValueRO.phase == Phase.end)
             {
+                int mutations = 0;
                 //Loop through all int metrics
                 foreach (var (metric, entity) in SystemAPI.Query<RefRO<MetricComponent<int>>>().WithNone<DestroyComponent>().WithEntityAccess())
                 {
 
-                    json += string.Format("Time: {0} Epoch: {1} Value: {2}", metric.ValueRO.timeStamp, metric.ValueRO.epoch, metric.ValueRO.value) + "\n";
+                    if(metric.ValueRO.type == MetricType.mutation) 
+                    {
+                        mutations++;
+                    }
+
+                    //json += string.Format("Time: {0} Epoch: {1} Value: {2}", metric.ValueRO.timeStamp, metric.ValueRO.epoch, metric.ValueRO.value) + "\n";
                     //Debug.Log(json);
                     ecb.RemoveComponent(entity, typeof(MetricComponent<int>));
                     ecb.AddComponent<DestroyComponent>(entity);
@@ -79,7 +85,7 @@ public partial class LoggerSystem : SystemBase
                     }
                     else 
                     {
-                        json += string.Format("Time: {0} Epoch: {1} Value: {2}", metric.ValueRO.timeStamp, metric.ValueRO.epoch, metric.ValueRO.value) + "\n";
+                        //json += string.Format("Time: {0} Epoch: {1} Value: {2}", metric.ValueRO.timeStamp, metric.ValueRO.epoch, metric.ValueRO.value) + "\n";
                     }
                     
                     
@@ -94,13 +100,13 @@ public partial class LoggerSystem : SystemBase
                     //Logger.LogTimeAndEpoch(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, fitnessMetric);
                     //Logger.LogEpoch(simState.ValueRO.currentEpoch, fitnessMetric);
                 }
-
+                Debug.Log(mutations);
                 Debug.Log(Logger.SaveJson());
 
                 //json += string.Format("Time: {0} Epoch: {1} Average Fitness: {2} Max Fitness: {3}", simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, averageFitness, highestFitness) + "\n";
 
                 //Debug.Log(json);
-                json = "";
+                //json = "";
                 
                 //Replace this later
 

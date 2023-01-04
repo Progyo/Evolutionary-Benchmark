@@ -68,18 +68,27 @@ public partial struct MutationSystem : ISystem
 
             //IMutateAlgorithm<int> test = new TestMutationAlgorithm { };
 
-            JobHandle handle = new MutateJob<TestFloatMutationAlgorithm,TestIntMutationAlgorithm> { random = random,
+            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Persistent);
+            EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();
+
+            JobHandle handle = new MutateJob<TestFloatMutationAlgorithm, TestIntMutationAlgorithm> { random = random,
                 intBufferLookup = _intBufferLookup,
                 floatBufferLookup = _floatBufferLookup,
-                entityTypeHandle = _entityTypeHandle
+                entityTypeHandle = _entityTypeHandle,
+                mutationChance = 100f,
+                floatMutationVariance = 2.5f,
+                intMutationVariance = 5,
+                ecb = ecbParallel,
+                epoch = simState.ValueRO.currentEpoch,
             }.ScheduleParallel(_mutationQuery, state.Dependency);
 
             handle.Complete();
-
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
             
             simState.ValueRW.phase = Phase.running;
 
-            LogMetric(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, ref state);
+            //LogMetric(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, ref state);
         }
     }
     [BurstCompile]
@@ -112,6 +121,21 @@ public unsafe struct MutateJob<floatAlg,intAlg> : IJobChunk where floatAlg : str
 
     public EntityTypeHandle entityTypeHandle;
 
+    public EntityCommandBuffer.ParallelWriter ecb;
+
+    [ReadOnly]
+    public float mutationChance;
+
+    [ReadOnly]
+    public int intMutationVariance;
+
+    [ReadOnly]
+    public float floatMutationVariance;
+
+    [ReadOnly]
+    public int epoch;
+
+
     [BurstCompile]
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
     {
@@ -131,7 +155,14 @@ public unsafe struct MutateJob<floatAlg,intAlg> : IJobChunk where floatAlg : str
             {
                 for (int j = 0; j < intbuffer.Length; j++)
                 {
-                    intAlgorithm.Mutate(ref intbuffer.ElementAt(j), random);
+                    bool mutated = intAlgorithm.Mutate(ref intbuffer.ElementAt(j), random, mutationChance, intMutationVariance);
+
+                    if (mutated) 
+                    {
+                        int sort = i * intbuffer.Length + j;
+                        //Entity entity = ecb.CreateEntity(sort);
+                        //ecb.AddComponent(sort, entity, new MetricComponent<int> { value = 1, timeStamp = 0f, epoch = epoch, type = MetricType.mutation });
+                    }
                 }
             }
 
@@ -140,11 +171,19 @@ public unsafe struct MutateJob<floatAlg,intAlg> : IJobChunk where floatAlg : str
             {
                 for (int j = 0; j < floatbuffer.Length; j++)
                 {
-                    floatAlgorithm.Mutate(ref floatbuffer.ElementAt(j), random);
+                    bool mutated = floatAlgorithm.Mutate(ref floatbuffer.ElementAt(j), random, mutationChance, floatMutationVariance);
+            
+                    if (mutated)
+                    {
+                        int sort = chunkEntityCount * intbuffer.Length + i * floatbuffer.Length + j;
+                        //Entity entity = ecb.CreateEntity(sort);
+                        //ecb.AddComponent(sort, entity, new MetricComponent<int> { value = 1, timeStamp = 0f, epoch = epoch, type = MetricType.mutation });
+                    }
                 }
             }
+
         }
-        
+
     }
 
     //https://stackoverflow.com/questions/17156179/pointers-of-generic-type
@@ -157,7 +196,7 @@ public interface IMutateIntAlgorithm
     public RefRW<EntityTypeComponent> entityTypeTag { get; set; }
 
 
-    public void Mutate(ref TraitBufferComponent<int> trait, RefRW<RandomComponent> random);
+    public bool Mutate(ref TraitBufferComponent<int> trait, RefRW<RandomComponent> random, float mutationChance, int mutationVariance);
 }
 
 public interface IMutateFloatAlgorithm
@@ -167,5 +206,5 @@ public interface IMutateFloatAlgorithm
     public RefRW<EntityTypeComponent> entityTypeTag { get; set; }
 
 
-    public void Mutate(ref TraitBufferComponent<float> trait, RefRW<RandomComponent> random);
+    public bool Mutate(ref TraitBufferComponent<float> trait, RefRW<RandomComponent> random, float mutationChance, float mutationVariance);
 }

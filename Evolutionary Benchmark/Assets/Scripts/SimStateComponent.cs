@@ -36,4 +36,21 @@ public struct SimStateComponent : IComponentData
     /// The entity prefab
     /// </summary>
     public Entity entityPrefab;
+
+    /// <summary>
+    /// The number of fields where entities can spawn on (Also the number of spawners)
+    /// </summary>
+    public int fields;
+
+
+    /// <summary>
+    /// The maximum amount to keep alive for the next generation. Range between 0 and 1
+    /// </summary>
+    public float survivePercent;
+
+    /// <summary>
+    /// The number of (blob) entities killed this generation
+    /// </summary>
+    public int killedThisGen;
+
 }

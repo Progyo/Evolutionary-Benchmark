@@ -4,12 +4,9 @@ using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.UniversalDelegates;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Transforms;
-using Unity.VisualScripting;
-using static Unity.VisualScripting.Metadata;
+
 
 [UpdateAfter(typeof(EvaluationSystem))]
 public partial class SelectionSystem : SystemBase
@@ -56,15 +53,19 @@ public partial class SelectionSystem : SystemBase
                 }
             );
 
-            int spawnerCount = 0;
+            int spawnerCount = simState.fields;
 
-            Entities.WithAll<SpawnPointComponent>().ForEach((Entity entity) =>
+            /*Entities.WithAll<SpawnPointComponent>().ForEach((Entity entity, SpawnPointComponent spawn) =>
             {
-                spawnerCount++;
-            }).Run();
+                if(spawn.type == EntityType.blob) 
+                {
+                    spawnerCount++;
+                }
+                
+            }).Run();*/
 
 
-            int toKeep = simState.maxEntities * spawnerCount / 2;
+            int toKeep = math.max(0,simState.maxEntities / 2 - simState.killedThisGen);
             //SUS(sorted, totalFitness, toKeep);
 
 
@@ -104,9 +105,15 @@ public partial class SelectionSystem : SystemBase
 
             pointers.Dispose();
 
-            //Log average fitness
-            AverageAndMaxFitnessMetric fitnessMetric = new AverageAndMaxFitnessMetric { averageFitness = totalFitness / count, maxFitness = population[0].Value, metricCount = 0 };
-            LoggerSystem.Logger.LogEpoch(simState.currentEpoch, fitnessMetric);
+            if(population.Count> 0) 
+            {
+                //Log average fitness
+                AverageAndMaxFitnessMetric fitnessMetric = new AverageAndMaxFitnessMetric { averageFitness = totalFitness / count, maxFitness = population[0].Value, metricCount = 0 };
+                LoggerSystem.Logger.LogEpoch(simState.currentEpoch, fitnessMetric);
+            }
+
+            KilledMetric killedMetric = new KilledMetric { killedThisGen = simState.killedThisGen };
+            LoggerSystem.Logger.LogEpoch(simState.currentEpoch, killedMetric);
 
 
             /*for (int i = 0; i < math.min(sorted.Count, 10); i++)
@@ -114,13 +121,16 @@ public partial class SelectionSystem : SystemBase
                 Debug.Log(GetComponent<LocalToWorldTransform>(sorted[i].Key).Value.Position);
             }*/
 
-            /*int keepCount = 0;
+            int keepCount = 0;
             Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
             {
                 keepCount++;
             }).Run();
 
-            UnityEngine.Debug.Log(keepCount);*/
+            SelectedMetric selectedMetric = new SelectedMetric { selected = keepCount };
+            LoggerSystem.Logger.LogEpoch(simState.currentEpoch, selectedMetric);
+
+            //UnityEngine.Debug.Log(keepCount);
         }
 
     }

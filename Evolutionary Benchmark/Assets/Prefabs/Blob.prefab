@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
-  size: 9
-  maxHealth: 8
-  maxEnergy: 7
+  size: 10
+  maxHealth: 10
+  maxEnergy: 5
   viewDistance: 6
   maxDecisionSpeed: 2
 --- !u!1 &8219850041381956005

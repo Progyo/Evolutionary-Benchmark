@@ -44,7 +44,38 @@ public partial class DestroyerSystem : SystemBase
             }
             */
 
-            if(simState.ValueRO.phase == Phase.end) 
+            //Destroy all entities with 0 health
+            int killed = 0;
+
+            Entities.WithAll<HealthComponent>().WithNone<DestroyComponent>().ForEach((Entity entity, HealthComponent health) =>
+            {
+                if (health.value <= 0f)
+                {
+                    ecb2.AddComponent<DestroyComponent>(entity);
+
+                    killed++;
+                }
+            }).Run();
+
+            if(killed > 0) 
+            {
+                ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
+                {
+                    currentEpoch = simState.ValueRO.currentEpoch,
+                    maxEntities = simState.ValueRO.maxEntities,
+                    maxEpochs = simState.ValueRO.maxEpochs,
+                    entityPrefab = simState.ValueRO.entityPrefab,
+                    epochDuration = simState.ValueRO.epochDuration,
+                    phase = simState.ValueRO.phase,
+                    timeElapsed = simState.ValueRO.timeElapsed,
+                    fields = simState.ValueRO.fields,
+                    killedThisGen = simState.ValueRO.killedThisGen + killed,
+                    survivePercent = simState.ValueRO.survivePercent
+                });
+            }
+
+
+            if (simState.ValueRO.phase == Phase.end) 
             {
                 
                 Entities.WithAll<EntityTypeComponent>().WithNone<KeepComponent>().ForEach((Entity entity) =>
@@ -52,11 +83,11 @@ public partial class DestroyerSystem : SystemBase
                     ecb2.AddComponent<DestroyComponent>(entity);
                 }).Run();
 
-                Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
+                /*Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
                 {
                     ecb2.RemoveComponent<KeepComponent>(entity);
                 }).Run();
-
+                */
 
                 ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
                 {
@@ -66,11 +97,14 @@ public partial class DestroyerSystem : SystemBase
                     entityPrefab = simState.ValueRO.entityPrefab,
                     epochDuration = simState.ValueRO.epochDuration,
                     phase = Phase.deleting,
-                    timeElapsed = simState.ValueRO.timeElapsed
+                    timeElapsed = simState.ValueRO.timeElapsed,
+                    fields = simState.ValueRO.fields,
+                    killedThisGen = simState.ValueRO.killedThisGen,
+                    survivePercent = simState.ValueRO.survivePercent,
                 });
 
-
             }
+
 
 
 
@@ -102,7 +136,10 @@ public partial class DestroyerSystem : SystemBase
                     entityPrefab = simState.ValueRO.entityPrefab,
                     epochDuration = simState.ValueRO.epochDuration,
                     phase = Phase.evaluated,
-                    timeElapsed = simState.ValueRO.timeElapsed
+                    timeElapsed = simState.ValueRO.timeElapsed,
+                    fields = simState.ValueRO.fields,
+                    killedThisGen = simState.ValueRO.killedThisGen,
+                    survivePercent = simState.ValueRO.survivePercent
                 });
             }
 

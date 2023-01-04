@@ -17,9 +17,16 @@ public struct TestFloatMutationAlgorithm : IMutateFloatAlgorithm
     public RefRW<EntityTypeComponent> entityTypeTag { get => _entityTypeTag; set => _entityTypeTag=value; }
 
     [BurstCompile]
-    public void Mutate(ref TraitBufferComponent<float> trait, RefRW<RandomComponent> random)
+    public bool Mutate(ref TraitBufferComponent<float> trait, RefRW<RandomComponent> random, float mutationChance, float mutationVariance)
     {
-        trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextFloat(-5f, 5f),trait.minValue),trait.maxValue);
+        bool mutated = false;
+
+        if(random.ValueRW.value.NextFloat(0,100f) < mutationChance) 
+        {
+            trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextFloat(-mutationVariance, mutationVariance), trait.minValue), trait.maxValue);
+            mutated = true;
+        }
+        return mutated;
     }
 
 }
@@ -35,9 +42,16 @@ public struct TestIntMutationAlgorithm : IMutateIntAlgorithm
     public RefRW<EntityTypeComponent> entityTypeTag { get => _entityTypeTag; set => _entityTypeTag = value; }
 
     [BurstCompile]
-    public void Mutate(ref TraitBufferComponent<int> trait, RefRW<RandomComponent> random)
+    public bool Mutate(ref TraitBufferComponent<int> trait, RefRW<RandomComponent> random, float mutationChance, int mutationVariance)
     {
-        trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextInt(-5, 5),trait.minValue),trait.maxValue);
+        bool mutated = false;
+
+        if (random.ValueRW.value.NextFloat(0, 100f) < mutationChance)
+        {
+            trait.value = math.min(math.max(trait.value + random.ValueRW.value.NextInt(-mutationVariance, mutationVariance), trait.minValue), trait.maxValue);
+            mutated = true;
+        }
+        return mutated;
     }
 
 }

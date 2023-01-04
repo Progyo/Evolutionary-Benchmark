@@ -9,4 +9,9 @@ public struct TargetPositionComponent : IComponentData
     /// The position the entity should move to
     /// </summary>
     public float3 value;
+
+    /// <summary>
+    /// The boundary which the entity is allowed to move in
+    /// </summary>
+    public float4 boundary;
 }

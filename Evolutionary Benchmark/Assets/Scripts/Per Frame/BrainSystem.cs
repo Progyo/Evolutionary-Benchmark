@@ -142,106 +142,10 @@ public partial struct BrainSystem : ISystem
     
 }
 
-/*
-[UpdateAfter(typeof(InputSystem))]
-public partial class BrainSystem : SystemBase
-{
-    protected override void OnUpdate()
-    {
-        RequireForUpdate<SimStateComponent>();
-
-        EntityQuery _targetQuery = new EntityQueryBuilder(Allocator.Temp)
-        .WithAllRW<TargetPositionComponent>()
-        .Build(this);
-
-        ;
-
-        EntityQuery _brainQuery = EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform),
-            typeof(TargetPositionComponent), typeof(MaxDecisionSpeedComponent), typeof(DecisionSpeedComponent),
-            typeof(EnergyComponent), typeof(HealthComponent));
-
-        BufferLookup<SeeBufferComponent> _seeBufferLookup = GetBufferLookup<SeeBufferComponent>(false);
-
-
-        ComponentTypeHandle<LocalToWorldTransform> _transformTypeHandle;
-        ComponentTypeHandle<TargetPositionComponent> _targetTypeHandle;
-        ComponentTypeHandle<MaxDecisionSpeedComponent> _maxDecisionSpeedTypeHandle;
-        ComponentTypeHandle<DecisionSpeedComponent> _decisionTimeLeftTypeHandle;
-        ComponentTypeHandle<EnergyComponent> _energyTypeHandle;
-        ComponentTypeHandle<HealthComponent> _healthTypeHandle;
-
-        _transformTypeHandle = GetComponentTypeHandle<LocalToWorldTransform>();
-        _targetTypeHandle = GetComponentTypeHandle<TargetPositionComponent>();
-        _maxDecisionSpeedTypeHandle = GetComponentTypeHandle<MaxDecisionSpeedComponent>();
-        _decisionTimeLeftTypeHandle = GetComponentTypeHandle<DecisionSpeedComponent>();
-        _energyTypeHandle = GetComponentTypeHandle<EnergyComponent>();
-        _healthTypeHandle = GetComponentTypeHandle<HealthComponent>();
-
-
-        bool success = SystemAPI.TryGetSingleton<SimStateComponent>(out SimStateComponent simState);
-
-        if (success && simState.phase == Phase.running)
-        {
-
-
-            RefRW<RandomComponent> random = SystemAPI.GetSingletonRW<RandomComponent>();
-
-            float deltaTime = SystemAPI.Time.DeltaTime;
-
-            _seeBufferLookup.Update(this);
-
-            _transformTypeHandle.Update(this);
-            _targetTypeHandle.Update(this);
-            _maxDecisionSpeedTypeHandle.Update(this);
-            _decisionTimeLeftTypeHandle.Update(this);
-            _energyTypeHandle.Update(this);
-            _healthTypeHandle.Update(this);
-
-            NativeArray<LocalToWorldTransform> transforms = _brainQuery.ToComponentDataArray<LocalToWorldTransform>(Allocator.TempJob);
-
-            //NativeArray<TargetPositionComponent> targets = _targetQuery.ToComponentDataArray<TargetPositionComponent>(Allocator.TempJob);
-            JobHandle handle = new BrainJob<BrainTest>
-            {
-                bufferLookup = _seeBufferLookup,
-                random = random,
-                deltaTime = deltaTime,
-                transformTypeHandle = _transformTypeHandle,
-                targetTypeHandle = _targetTypeHandle,
-                maxDecisionSpeedTypeHandle = _maxDecisionSpeedTypeHandle,
-                decisionTimeLeftTypeHandle = _decisionTimeLeftTypeHandle,
-                energyTypeHandle = _energyTypeHandle,
-                healthTypeHandle = _healthTypeHandle
-            }.ScheduleParallel(_brainQuery, Dependency);
-            handle.Complete();
-
-            transforms.Dispose();
-        }
-    }
-}
-*/
 
 //https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/81d262961b70ad285783d52a362b7ad75c85b549/ECSSamples/Assets/HelloCube/5.%20IJobChunk/RotationSpeedSystem.cs
 //https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/EntitiesSamples/HelloCube/Assets/5.%20IJobChunk/RotationSpeedSystem.cs
 //https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/iterating-data-ijobchunk.html
-/*[BurstCompile]
-public partial struct BrainJob: IJobEntity//<T> : IJobEntity where T :  IAspect, IBrain
-{
-    [NativeDisableParallelForRestriction]
-    public BufferLookup<SeeBufferComponent> bufferLookup;
-
-    [NativeDisableUnsafePtrRestriction]
-    public RefRW<RandomComponent> random;
-
-    [ReadOnly]
-    public float deltaTime;
-
-    [BurstCompile]
-    public void Execute(ref BrainAspect aspect)
-    {
-        aspect.MoveToClosest(deltaTime, bufferLookup, random);
-    }
-}*/
-
 
 [BurstCompile]
 public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
@@ -328,7 +232,12 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 //action = BrainAction.nothing;
                 if (action == BrainAction.move)
                 {
-                    target.ValueRW.value = moveTo;
+
+                    float3 bottomLeft = new float3(target.ValueRO.boundary.x, 0f, target.ValueRO.boundary.y);
+                    float3 topRight = new float3(target.ValueRO.boundary.z, 0f, target.ValueRO.boundary.w);
+
+                    //Restrict movement to boundaries
+                    target.ValueRW.value = math.clamp(moveTo, bottomLeft, topRight);
                 }
                 else if (action == BrainAction.eat)
                 {
