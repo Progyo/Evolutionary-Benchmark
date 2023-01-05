@@ -18,8 +18,8 @@ public partial class ApplySystem : SystemBase
         RequireForUpdate<SimStateComponent>();
 
 
-        _intBufferLookup = GetBufferLookup<TraitBufferComponent<int>>(true);
-        _floatBufferLookup = GetBufferLookup<TraitBufferComponent<float>>(true);
+        _intBufferLookup = GetBufferLookup<TraitBufferComponent<int>>(false);
+        _floatBufferLookup = GetBufferLookup<TraitBufferComponent<float>>(false);
     }
 
     protected override void OnUpdate()
@@ -30,24 +30,20 @@ public partial class ApplySystem : SystemBase
         if (simState.ValueRO.phase == Phase.start) 
         {
 
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Persistent);
-
-            EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();
-
             _intBufferLookup.Update(this);
             _floatBufferLookup.Update(this);
 
+            EntityCommandBuffer ecb = GetSingleton<EndInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
+            EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();
+
             JobHandle handle = new ApplyJob
             {
-                ecb = ecbParallel,
                 intLookup = _intBufferLookup,
                 floatLookup = _floatBufferLookup,
+                ecb = ecbParallel,
             }.ScheduleParallel(Dependency);
 
             handle.Complete();
-
-            ecb.Playback(EntityManager);
-            ecb.Dispose();
 
             simState = GetSingletonRW<SimStateComponent>();
             simState.ValueRW.phase = Phase.running;
@@ -58,17 +54,17 @@ public partial class ApplySystem : SystemBase
     [BurstCompile]
     private partial struct ApplyJob: IJobEntity 
     {
-        public EntityCommandBuffer.ParallelWriter ecb;
-
-        [ReadOnly]
+        [NativeDisableParallelForRestriction]
         public BufferLookup<TraitBufferComponent<int>> intLookup;
-        [ReadOnly]
+        [NativeDisableParallelForRestriction]
         public BufferLookup<TraitBufferComponent<float>> floatLookup;
 
-        [BurstCompile]
-        public void Execute() 
-        {
+        public EntityCommandBuffer.ParallelWriter ecb;
 
+        [BurstCompile]
+        public void Execute(ApplyAspect aspect, [EntityInQueryIndex] int sortKey) 
+        {
+            aspect.SetTraits(intLookup, floatLookup, ecb, sortKey);;
         }
     }
 }

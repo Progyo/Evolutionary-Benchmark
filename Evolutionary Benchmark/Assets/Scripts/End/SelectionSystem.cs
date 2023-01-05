@@ -100,7 +100,7 @@ public partial class SelectionSystem : SystemBase
                 populationStruct[i] = new Population { entity = population[i].Key, fitness = population[i].Value };
             }
 
-            JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 1, Dependency);
+            JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 100, Dependency);
 
             handle.Complete();
             populationStruct.Dispose();

@@ -16,7 +16,7 @@ using UnityEngine;
 public readonly partial struct SpawnAspect : IAspect
 {
 
-    private readonly TransformAspect transformAspect;
+    private readonly RefRW<LocalToWorldTransform> transformRef;
     private readonly RefRW<SpawnPointComponent> spawnPoint;
 
 
@@ -59,20 +59,20 @@ public readonly partial struct SpawnAspect : IAspect
                 if(sortKey * newSpawnCount + i >= maxToSpawnCount) 
                 { break; }
                 //Set position to some random position in boundaries
-                float3 pos =  transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX,maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
+                float3 pos =  transformRef.ValueRO.Value.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX,maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
 
                 //Create the entity creation command
                 Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
 
 
-                int defaultSize = 10;// +epoch*5;
+                //int defaultSize = 10;// +epoch*5;
 
                 //Set the transform
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = defaultSize / 10f };
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = transformRef.ValueRO.Value.Scale};
                 ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
             
                 //Set the boundary and target position 
-                float4 boundary = new float4(transformAspect.Position.x, transformAspect.Position.z, transformAspect.Position.x, transformAspect.Position.z) + spawnPoint.ValueRO.boundary;
+                float4 boundary = new float4(transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z, transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z) + spawnPoint.ValueRO.boundary;
                 ecb.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
             
             
@@ -89,12 +89,10 @@ public readonly partial struct SpawnAspect : IAspect
                 }
 
                 Entity e = toKeep[index];
-                float3 pos = transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX, maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
-
-                int defaultSize = 10;
+                float3 pos = transformRef.ValueRO.Value.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX, maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
 
                 //Set the transform
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = defaultSize/10f };
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = transformRef.ValueRO.Value.Scale };
                 ecb.SetComponent<LocalToWorldTransform>(index, e, new LocalToWorldTransform { Value = transform });
 
                 //Set health and energy components back to max
@@ -102,7 +100,7 @@ public readonly partial struct SpawnAspect : IAspect
                 ecb2.SetComponent<EnergyComponent>(index, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
 
                 //Set the boundary and target position 
-                float4 boundary = new float4(transformAspect.Position.x, transformAspect.Position.z, transformAspect.Position.x, transformAspect.Position.z) + spawnPoint.ValueRO.boundary;
+                float4 boundary = new float4(transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z, transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z) + spawnPoint.ValueRO.boundary;
                 ecb2.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
                 
             }
@@ -127,16 +125,9 @@ public readonly partial struct FoodSpawnAspect : IAspect
     /// This function spawns entities at the spawner location within the given boundaries
     /// </summary>
     /// <param name="ecb"> The entity command buffer which allows the entities to be spawned </param>
-    /// /// <param name="ecb"> The entity command buffer which changes entity components</param>
     /// <param name="sortKey"> The sort key (needs to be unique to this thread) </param>
-    /// <param name="newSpawnCount"> The number of entities that need to be spawned new for this spawner</param>
-    /// <param name="toKeepSpawn"> The number of entities that need to be generated (respawned) for this spawner</param>
     /// <param name="foodSpawnCount"> The number of food entities to spawn for this spawner</param>
-    /// <param name="toKeep"> Entity array of all the entities from the previous generation to keep (Only the values need to be reset and a new position assigned)</param>
-    /// <param name="toKeepMaxHealth"> Reference to the entities max health</param>
-    /// <param name="toKeepMaxEnergy"> Reference to the entities max energy</param>
-    /// <param name="intBufferLookup"> Integer trait lookup </param>
-    /// <param name="floatBufferLookup"> Float trait lookup </param>
+
     [BurstCompile]
     public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, int sortKey, int foodSpawnCount)
     {

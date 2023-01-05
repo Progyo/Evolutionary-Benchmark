@@ -15,7 +15,7 @@ public readonly partial struct MoveAspect : IAspect
     private readonly RefRW<TargetPositionComponent> targetPosition;
 
     [BurstCompile]
-    public void Move(float deltaTime, BufferLookup<TraitBufferComponent<float>> floatTraitbufferLookup, BufferLookup<TraitBufferComponent<int>> intTraitbufferLookup) 
+    public void Move(float deltaTime, BufferLookup<TraitBufferComponent<float>> floatTraitbufferLookup, BufferLookup<TraitBufferComponent<int>> intTraitbufferLookup, RefRW<RandomComponent> random) 
     {
 
 
@@ -62,6 +62,17 @@ public readonly partial struct MoveAspect : IAspect
         {
             transformAspect.Position += dir * deltaTime * speed / size;
             
+        }
+
+
+        float maxX = targetPosition.ValueRO.boundary.z;
+        float maxY = targetPosition.ValueRO.boundary.w;
+        float minX = targetPosition.ValueRO.boundary.x;
+        float minY = targetPosition.ValueRO.boundary.y;
+
+        if (transformAspect.Position.x > maxX || transformAspect.Position.x < minX || transformAspect.Position.z > maxY || transformAspect.Position.z < minY) 
+        {
+            transformAspect.Position = new float3(random.ValueRW.value.NextFloat(minX,maxX), 0f, random.ValueRW.value.NextFloat(minY, maxY));
         }
 
     }

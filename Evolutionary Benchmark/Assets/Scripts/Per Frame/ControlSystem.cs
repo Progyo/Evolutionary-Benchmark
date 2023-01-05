@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
 [BurstCompile]
 [UpdateAfter(typeof(BrainSystem))]
@@ -47,11 +48,14 @@ public partial struct ControlSystem : ISystem
 
             float deltaTime = SystemAPI.Time.DeltaTime;
 
+            RefRW<RandomComponent> random = SystemAPI.GetSingletonRW<RandomComponent>();
+
             _floatTraitBufferLookup.Update(ref state);
             _intTraitBufferLookup.Update(ref state);
             JobHandle handle = new MoveJob { deltaTime = deltaTime,
                 floatTraitbufferLookup = _floatTraitBufferLookup,
-                intTraitbufferLookup = _intTraitBufferLookup  }.ScheduleParallel(state.Dependency);
+                intTraitbufferLookup = _intTraitBufferLookup,
+            random = random}.ScheduleParallel(state.Dependency);
 
             handle.Complete();
 
@@ -72,10 +76,13 @@ public partial struct ControlSystem : ISystem
         [NativeDisableParallelForRestriction]
         public BufferLookup<TraitBufferComponent<int>> intTraitbufferLookup;
 
+        [NativeDisableUnsafePtrRestriction]
+        public RefRW<RandomComponent> random;
+
         [BurstCompile]
         public void Execute(ref MoveAspect move) 
         {
-            move.Move(deltaTime, floatTraitbufferLookup, intTraitbufferLookup);
+            move.Move(deltaTime, floatTraitbufferLookup, intTraitbufferLookup, random);
             move.Rotate();
             //move.Position += new float3(deltaTime,0f,0f);
         }
