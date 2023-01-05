@@ -26,7 +26,7 @@ public struct BrainTest :  IBrain
     public RefRW<HealthComponent> health { get { return _health; } set { _health = value; } }
 
     [BurstCompile]
-    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume)
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume, BufferLookup<TraitBufferComponent<int>> intLookup, BufferLookup<TraitBufferComponent<float>> floatLookup)
     {
 
         float max = 10f;
@@ -73,7 +73,42 @@ public struct BrainTest :  IBrain
 
         moveTo = closestPos;
 
-        float cost = 1f;
+
+        int size = 1;
+        float speed = 1f;
+
+
+        bool success = intLookup.TryGetBuffer(_entity.ValueRO, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
+
+        if (success) 
+        {
+            for (int i = 0; i < intBuffer.Length; i++)
+            {
+                if (intBuffer[i].traitType == TraitType.size) 
+                {
+                    size = intBuffer[i].value;
+                    break;
+                }
+            }
+        }
+
+
+
+        success = floatLookup.TryGetBuffer(_entity.ValueRO, out DynamicBuffer<TraitBufferComponent<float>> floatBuffer);
+
+        if (success)
+        {
+            for (int i = 0; i < floatBuffer.Length; i++)
+            {
+                if (floatBuffer[i].traitType == TraitType.speed)
+                {
+                    speed = floatBuffer[i].value;
+                    break;
+                }
+            }
+        }
+
+        float cost = speed * size / 10f;
 
         //Action cost
         if (_energy.ValueRO.value > 0)

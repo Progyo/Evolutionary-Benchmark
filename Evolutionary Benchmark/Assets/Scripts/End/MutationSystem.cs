@@ -75,7 +75,7 @@ public partial struct MutationSystem : ISystem
                 intBufferLookup = _intBufferLookup,
                 floatBufferLookup = _floatBufferLookup,
                 entityTypeHandle = _entityTypeHandle,
-                mutationChance = 100f,
+                mutationChance = 7.5f,
                 floatMutationVariance = 2.5f,
                 intMutationVariance = 5,
                 ecb = ecbParallel,

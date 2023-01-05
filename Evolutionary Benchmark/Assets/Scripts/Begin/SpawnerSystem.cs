@@ -76,10 +76,10 @@ public partial class SpawnerSystem : SystemBase//ISystem
             //Generate = Create entity from set of traits
             //ReSpawn = Set entity stats back to max and reposition
 
-            int toSpawnCount = simState.maxEntities - toKeepList.Length*2;
+            int toSpawnCount = simState.maxEntities - toKeepList.Length;
 
             //Remove this later
-            toSpawnCount += toKeepList.Length;
+            //toSpawnCount += toKeepList.Length;
 
             //Dispose of lists
             toKeepList.Dispose();
@@ -99,7 +99,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
             int toKeepSpawnCount = (int)(math.ceil(toKeep.Length / fields));
 
             //The number of food to spawn per spawner
-            int foodCount = (int)(math.ceil(simState.maxEntities / fields));
+            int foodCount = (int)(math.ceil(simState.maxEntities / fields)) * 4;
 
             _intBufferLookup.Update(this);
             _floatBufferLookup.Update(this);

@@ -8794,9 +8794,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phase: 2
   timeElapsed: 0
-  epochDuration: 10
+  epochDuration: 30
   currentEpoch: 0
-  maxEpochs: 10
+  maxEpochs: 50
   maxEntities: 4096
   seed: 10
   prefab: {fileID: 8219850041221293206, guid: 29f753f9d8356184791965170bfe6df3, type: 3}

@@ -39,7 +39,7 @@ public static string SaveJson()
 return "";
 }
 }*/
-[UpdateAfter(typeof(SelectionSystem))]
+[UpdateAfter(typeof(CombinationSystem))]
 public partial class LoggerSystem : SystemBase
 {
     //string json = "";
@@ -162,13 +162,10 @@ public partial class LoggerSystem : SystemBase
             }
 
             cache[epoch][time].Add(metric.ToJsonString());
-            //Debug.Log(string.Format("Time: {0} Epoch: {1} Metric: {2}", time, epoch, metric.ToJsonString()));
-            //Debug.Log(cache);
         }
 
         public static void LogEpoch(int epoch, IMetric metric)
         {
-            //Debug.Log(string.Format("Epoch: {0} Metric: {1}", epoch, metric.ToJsonString()));
             LogTimeAndEpoch(-1f, epoch, metric);
         }
 

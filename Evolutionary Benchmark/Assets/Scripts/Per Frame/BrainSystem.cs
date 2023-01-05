@@ -24,6 +24,9 @@ public partial struct BrainSystem : ISystem
 
     BufferLookup<SeeBufferComponent> _seeBufferLookup;
 
+    BufferLookup<TraitBufferComponent<int>> _intLookup;
+    BufferLookup<TraitBufferComponent<float>> _floatLookup;
+
 
     //Brain stuff
 
@@ -63,6 +66,9 @@ public partial struct BrainSystem : ISystem
 
 
         _seeBufferLookup = state.GetBufferLookup<SeeBufferComponent>(false);
+        _intLookup = state.GetBufferLookup <TraitBufferComponent<int>> (false);
+        _floatLookup = state.GetBufferLookup<TraitBufferComponent<float>>(false);
+
 
         _transformTypeHandle = state.GetComponentTypeHandle<LocalToWorldTransform>();
         _targetTypeHandle = state.GetComponentTypeHandle<TargetPositionComponent>();
@@ -98,6 +104,8 @@ public partial struct BrainSystem : ISystem
             float deltaTime = SystemAPI.Time.DeltaTime;
 
             _seeBufferLookup.Update(ref state);
+            _intLookup.Update(ref state);
+            _floatLookup.Update(ref state);
 
             _transformTypeHandle.Update(ref state);
             _targetTypeHandle.Update(ref state);
@@ -128,6 +136,8 @@ public partial struct BrainSystem : ISystem
                 entityTypeHandle = _entityTypeHandle,
                 maxEnergyTypeHandle = _maxEnergyTypeHandle,
                 maxHealthTypeHandle = _maxHealthTypeHandle,
+                intLookup = _intLookup,
+                floatLookup = _floatLookup,
                 ecb = ecbParallel
             }.ScheduleParallel(_brainQuery, state.Dependency);
             handle.Complete();
@@ -171,6 +181,12 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
     public EntityTypeHandle entityTypeHandle;
 
     public EntityCommandBuffer.ParallelWriter ecb;
+
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<TraitBufferComponent<int>> intLookup;
+    [NativeDisableParallelForRestriction]
+    public BufferLookup<TraitBufferComponent<float>> floatLookup;
+
 
     [BurstCompile]
     public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -228,7 +244,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                 target.ValueRW.value = transform.ValueRO.Value.Position;
 
 
-                BrainAction action = brain.See(deltaTime, bufferLookup, random, out float3 moveTo, out Entity entityToConsume);
+                BrainAction action = brain.See(deltaTime, bufferLookup, random, out float3 moveTo, out Entity entityToConsume, intLookup, floatLookup);
                 //action = BrainAction.nothing;
                 if (action == BrainAction.move)
                 {
@@ -323,5 +339,5 @@ public interface IBrain
     /// <param name="bufferLookup"></param>
     /// <param name="random"></param>
     //[BurstCompile]
-    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume);
+    public BrainAction See(float deltaTime, BufferLookup<SeeBufferComponent> bufferLookup, RefRW<RandomComponent> random, out float3 moveTo, out Entity entityToConsume, BufferLookup<TraitBufferComponent<int>> intLookup, BufferLookup<TraitBufferComponent<float>> floatLookup);
 }

@@ -11,12 +11,18 @@ using Unity.Mathematics;
 [UpdateAfter(typeof(EvaluationSystem))]
 public partial class SelectionSystem : SystemBase
 {
+    BufferLookup<TraitBufferComponent<int>> _intBufferLookup;
+    BufferLookup<TraitBufferComponent<float>> _floatBufferLookup;
 
     protected override void OnCreate()
     {
         base.OnCreate();
 
         RequireForUpdate<SimStateComponent>();
+
+
+        _intBufferLookup = GetBufferLookup<TraitBufferComponent<int>>(false);
+        _floatBufferLookup = GetBufferLookup<TraitBufferComponent<float>>(false);
     }
     protected override void OnUpdate()
     {
@@ -94,10 +100,72 @@ public partial class SelectionSystem : SystemBase
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Persistent);
             EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();
 
-            //Convert to native array
+            //Metric stuff
+            _intBufferLookup.Update(this);
+            _floatBufferLookup.Update(this);
+
+
+            SizeMetric sizeMetric = new SizeMetric { topSize = 0f, totalCount = 0, totalSize = 0f, worstSize = 0f };
+            SpeedMetric speedMetric = new SpeedMetric{ topSpeed = 0f, totalCount = 0, totalSpeed = 0f, worstSpeed = 0f };
+
+
+
+            //Convert to native array and log some metrics
             for (int i = 0; i < population.Count; i++)
             {
                 populationStruct[i] = new Population { entity = population[i].Key, fitness = population[i].Value };
+
+
+                //Size Metric
+
+                bool successBuffer = _intBufferLookup.TryGetBuffer(population[i].Key, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
+                if (successBuffer) 
+                {
+                    for (int j = 0; j < intBuffer.Length; j++)
+                    {
+                        if (intBuffer[j].traitType == TraitType.size) 
+                        {
+                            sizeMetric.totalSize += intBuffer[j].value;
+                            sizeMetric.totalCount++;
+
+                            if (i == 0) 
+                            {
+                                sizeMetric.topSize = intBuffer[j].value;
+                            }
+                            else if (i == population.Count - 1) 
+                            {
+                                sizeMetric.worstSize = intBuffer[j].value;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                //Speed Metric
+
+                successBuffer = _floatBufferLookup.TryGetBuffer(population[i].Key, out DynamicBuffer<TraitBufferComponent<float>> floatBuffer);
+                if (successBuffer)
+                {
+                    for (int j = 0; j < floatBuffer.Length; j++)
+                    {
+                        if (floatBuffer[j].traitType == TraitType.speed)
+                        {
+                            speedMetric.totalSpeed += floatBuffer[j].value;
+                            speedMetric.totalCount++;
+
+                            if (i == 0)
+                            {
+                                speedMetric.topSpeed = floatBuffer[j].value;
+                            }
+                            else if (i == population.Count - 1)
+                            {
+                                speedMetric.worstSpeed = floatBuffer[j].value;
+                            }
+                            break;
+                        }
+                    }
+                }
+
             }
 
             JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 100, Dependency);
@@ -120,7 +188,8 @@ public partial class SelectionSystem : SystemBase
 
             KilledMetric killedMetric = new KilledMetric { killedThisGen = simState.killedThisGen };
             LoggerSystem.Logger.LogEpoch(simState.currentEpoch, killedMetric);
-
+            LoggerSystem.Logger.LogEpoch(simState.currentEpoch, sizeMetric);
+            LoggerSystem.Logger.LogEpoch(simState.currentEpoch, speedMetric);
 
             /*for (int i = 0; i < math.min(sorted.Count, 10); i++)
             {
