@@ -9,6 +9,9 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
+/// <summary>
+/// Spawn aspect that allows the IEntityJob to loop through all the spawners.
+/// </summary>
 [BurstCompile]
 public readonly partial struct SpawnAspect : IAspect
 {
@@ -17,19 +20,34 @@ public readonly partial struct SpawnAspect : IAspect
     private readonly RefRW<SpawnPointComponent> spawnPoint;
 
 
+    /// <summary>
+    /// This function spawns entities at the spawner location within the given boundaries
+    /// </summary>
+    /// <param name="ecb"> The entity command buffer which allows the entities to be spawned </param>
+    /// /// <param name="ecb"> The entity command buffer which changes entity components</param>
+    /// <param name="sortKey"> The sort key (needs to be unique to this thread) </param>
+    /// <param name="newSpawnCount"> The number of entities that need to be spawned new for this spawner</param>
+    /// <param name="toKeepSpawn"> The number of entities that need to be generated (respawned) for this spawner</param>
+    /// <param name="foodSpawnCount"> The number of food entities to spawn for this spawner</param>
+    /// <param name="toKeep"> Entity array of all the entities from the previous generation to keep (Only the values need to be reset and a new position assigned)</param>
+    /// <param name="toKeepMaxHealth"> Reference to the entities max health</param>
+    /// <param name="toKeepMaxEnergy"> Reference to the entities max energy</param>
+    /// <param name="intBufferLookup"> Integer trait lookup </param>
+    /// <param name="floatBufferLookup"> Float trait lookup </param>
     [BurstCompile]
-    public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, int sortKey, int newSpawnCount, int toKeepSpawn, int foodSpawnCount,NativeArray<Entity> toKeep, /*NativeArray<RefRef<TransformAspect>> toKeepTransforms,
+    public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, EntityCommandBuffer.ParallelWriter ecb2, int sortKey, int newSpawnCount, int maxToSpawnCount, int toKeepSpawn,NativeArray<Entity> toKeep, /*NativeArray<RefRef<TransformAspect>> toKeepTransforms,
         NativeArray<RefRef<HealthComponent>> toKeepHealth, NativeArray<RefRef<EnergyComponent>> toKeepEnergy, */NativeArray<RefRef<MaxHealthComponent>> toKeepMaxHealth, NativeArray<RefRef<MaxEnergyComponent>> toKeepMaxEnergy,
-        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup) 
+        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup, int epoch) 
     {
-
+        //Define boundaries as min and max points
         float maxX = spawnPoint.ValueRO.boundary.z;
         float maxY = spawnPoint.ValueRO.boundary.w;
         float minX = spawnPoint.ValueRO.boundary.x;
         float minY = spawnPoint.ValueRO.boundary.y;
 
+        //The way this is currently done, it only allows for one type of moving entity
 
-
+        //If the type is blob then iterrate
         if (spawnPoint.ValueRO.type == EntityType.blob)
         {
 
@@ -37,89 +55,101 @@ public readonly partial struct SpawnAspect : IAspect
 
             for (int i = 0; i < newSpawnCount; i++)
             {
+                //Don't accidentally spawn too many
+                if(sortKey * newSpawnCount + i >= maxToSpawnCount) 
+                { break; }
+                //Set position to some random position in boundaries
                 float3 pos =  transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX,maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
 
+                //Create the entity creation command
                 Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
 
 
-                /*bool success = intBufferLookup.TryGetBuffer(e, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
+                int defaultSize = 10;// +epoch*5;
 
-                bool success2 = floatBufferLookup.TryGetBuffer(e, out DynamicBuffer<TraitBufferComponent<float>> floatBuffer);
-
-                //Destroy entity if not trait buffer
-                if (!success || !success2) 
-                {
-                    ecb.AddComponent<DestroyComponent>((sortKey + 1) * toKeepSpawn + i, e);
-                    continue;
-                }
-
-                int size = 1;
-                for (int j = 0; j < intBuffer.Length; j++)
-                {
-                    if(intBuffer.ElementAt(j).traitType == TraitType.size) 
-                    {
-                        size = intBuffer.ElementAt(j).value;
-                        break;
-                    }
-                }*/
-                int size = 10;
-
-
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = size/10f };
-                //ecb.SetComponent<SpeedComponent>(sortKey, e, new SpeedComponent { value = spawnPoint.ValueRW.random.NextFloat(1f, 20f) });
+                //Set the transform
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = defaultSize / 10f };
                 ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
             
-
+                //Set the boundary and target position 
                 float4 boundary = new float4(transformAspect.Position.x, transformAspect.Position.z, transformAspect.Position.x, transformAspect.Position.z) + spawnPoint.ValueRO.boundary;
                 ecb.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
             
             
             }
 
+            //Loop through all the ones to keep
             for (int i = 0; i < toKeepSpawn; i++)
             {
-                int index = math.min(sortKey * toKeepSpawn + i, toKeep.Length-1);
+                int index = sortKey * toKeepSpawn + i; //math.min(sortKey * toKeepSpawn + i, toKeep.Length-1);
+
+                if (index >= toKeep.Length) 
+                {
+                    break;
+                }
+
                 Entity e = toKeep[index];
                 float3 pos = transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX, maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
 
+                int defaultSize = 10;
 
-                bool success = intBufferLookup.TryGetBuffer(e, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
-
-                bool success2 = floatBufferLookup.TryGetBuffer(e, out DynamicBuffer<TraitBufferComponent<float>> floatBuffer);
-
-                //Destroy entity if not trait buffer
-                if (!success || !success2)
-                {
-                    ecb.AddComponent<DestroyComponent>((sortKey + 1) * toKeepSpawn + i, e);
-                    //throw new NotImplementedException();
-                    continue;
-                }
-
-                int size = 1;
-                for (int j = 0; j < intBuffer.Length; j++)
-                {
-                    if (intBuffer.ElementAt(j).traitType == TraitType.size)
-                    {
-                        size = intBuffer.ElementAt(j).value;
-                        break;
-                    }
-                }
-
-
-
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = size/10f };
+                //Set the transform
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = defaultSize/10f };
                 ecb.SetComponent<LocalToWorldTransform>(index, e, new LocalToWorldTransform { Value = transform });
-                ecb.SetComponent<HealthComponent>(index, e, new HealthComponent { value = toKeepMaxHealth[index].ValueRO.value });
-                ecb.SetComponent<EnergyComponent>(index, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
 
+                //Set health and energy components back to max
+                ecb2.SetComponent<HealthComponent>(index, e, new HealthComponent { value = toKeepMaxHealth[index].ValueRO.value });
+                ecb2.SetComponent<EnergyComponent>(index, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
 
+                //Set the boundary and target position 
                 float4 boundary = new float4(transformAspect.Position.x, transformAspect.Position.z, transformAspect.Position.x, transformAspect.Position.z) + spawnPoint.ValueRO.boundary;
-                ecb.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
+                ecb2.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
                 
             }
         }
-        else if (spawnPoint.ValueRO.type == EntityType.food)
+
+    }
+
+}
+
+/// <summary>
+/// Spawn aspect that allows the IEntityJob to loop through all the spawners.
+/// </summary>
+[BurstCompile]
+public readonly partial struct FoodSpawnAspect : IAspect
+{
+
+    private readonly TransformAspect transformAspect;
+    private readonly RefRW<FoodSpawnPointComponent> spawnPoint;
+
+
+    /// <summary>
+    /// This function spawns entities at the spawner location within the given boundaries
+    /// </summary>
+    /// <param name="ecb"> The entity command buffer which allows the entities to be spawned </param>
+    /// /// <param name="ecb"> The entity command buffer which changes entity components</param>
+    /// <param name="sortKey"> The sort key (needs to be unique to this thread) </param>
+    /// <param name="newSpawnCount"> The number of entities that need to be spawned new for this spawner</param>
+    /// <param name="toKeepSpawn"> The number of entities that need to be generated (respawned) for this spawner</param>
+    /// <param name="foodSpawnCount"> The number of food entities to spawn for this spawner</param>
+    /// <param name="toKeep"> Entity array of all the entities from the previous generation to keep (Only the values need to be reset and a new position assigned)</param>
+    /// <param name="toKeepMaxHealth"> Reference to the entities max health</param>
+    /// <param name="toKeepMaxEnergy"> Reference to the entities max energy</param>
+    /// <param name="intBufferLookup"> Integer trait lookup </param>
+    /// <param name="floatBufferLookup"> Float trait lookup </param>
+    [BurstCompile]
+    public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, int sortKey, int foodSpawnCount)
+    {
+        //Define boundaries as min and max points
+        float maxX = spawnPoint.ValueRO.boundary.z;
+        float maxY = spawnPoint.ValueRO.boundary.w;
+        float minX = spawnPoint.ValueRO.boundary.x;
+        float minY = spawnPoint.ValueRO.boundary.y;
+
+        //The way this is currently done, it only allows for one type of moving entity
+        if (spawnPoint.ValueRO.type == EntityType.food)
         {
+            //Spawn the found within the boundary
             for (int i = 0; i < foodSpawnCount; i++)
             {
                 float3 pos = transformAspect.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX, maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));

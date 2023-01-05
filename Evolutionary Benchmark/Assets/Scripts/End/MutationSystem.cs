@@ -86,7 +86,7 @@ public partial struct MutationSystem : ISystem
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
             
-            simState.ValueRW.phase = Phase.running;
+            //simState.ValueRW.phase = Phase.running;
 
             //LogMetric(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, ref state);
         }

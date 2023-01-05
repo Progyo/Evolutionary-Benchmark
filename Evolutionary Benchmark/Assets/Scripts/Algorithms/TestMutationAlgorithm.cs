@@ -6,6 +6,9 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
+/// <summary>
+/// A test mutation algorithm that mutates float values with a probability of mutationChance/100 and a variance of mutationVariance
+/// </summary>
 [BurstCompile]
 public struct TestFloatMutationAlgorithm : IMutateFloatAlgorithm
 {
@@ -31,7 +34,10 @@ public struct TestFloatMutationAlgorithm : IMutateFloatAlgorithm
 
 }
 
-
+/// <summary>
+/// A test mutation algorithm that mutates int values with a probability of mutationChance/100 and a variance of mutationVariance
+/// </summary>
+[BurstCompile]
 public struct TestIntMutationAlgorithm : IMutateIntAlgorithm
 {
 

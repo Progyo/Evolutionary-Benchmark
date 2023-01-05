@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 
+/// <summary>
+/// The way the spawner should behave
+/// </summary>
 public enum SpawnStrategy 
 {
     /// <summary>
@@ -16,6 +19,10 @@ public enum SpawnStrategy
     ring,
 }
 
+
+/// <summary>
+/// Store all relevant data about the spawn point
+/// </summary>
 public struct SpawnPointComponent : IComponentData
 {
 
@@ -26,6 +33,40 @@ public struct SpawnPointComponent : IComponentData
 
     public Random random;
     
+    /// <summary>
+    /// The type of entity this spawner spawns
+    /// </summary>
+    public EntityType type;
+
+    /// <summary>
+    /// The boundary of the spawn area (area that the entity is allowed to move in)
+    /// </summary>
+    public float4 boundary;
+
+    /// <summary>
+    /// The spawn radius
+    /// </summary>
+    public float radius;
+
+    /// <summary>
+    /// How the entites should be spawned
+    /// </summary>
+    public SpawnStrategy strategy;
+}
+
+/// <summary>
+/// Store all relevant data about the spawn point
+/// </summary>
+public struct FoodSpawnPointComponent : IComponentData
+{
+
+    /// <summary>
+    /// The standard entity that should be spawned
+    /// </summary>
+    public Entity prefab;
+
+    public Random random;
+
     /// <summary>
     /// The type of entity this spawner spawns
     /// </summary>

@@ -65,7 +65,13 @@ public partial class SelectionSystem : SystemBase
             }).Run();*/
 
 
-            int toKeep = math.max(0,simState.maxEntities / 2 - simState.killedThisGen);
+            int toKeep = (int)math.ceil(simState.maxEntities / 2f);
+            
+            if(toKeep > simState.maxEntities - simState.killedThisGen) 
+            {
+                toKeep = math.max(0, simState.maxEntities-simState.killedThisGen);
+            }
+            
             //SUS(sorted, totalFitness, toKeep);
 
 
@@ -94,7 +100,7 @@ public partial class SelectionSystem : SystemBase
                 populationStruct[i] = new Population { entity = population[i].Key, fitness = population[i].Value };
             }
 
-            JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 100, Dependency);
+            JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 1, Dependency);
 
             handle.Complete();
             populationStruct.Dispose();
@@ -121,11 +127,34 @@ public partial class SelectionSystem : SystemBase
                 Debug.Log(GetComponent<LocalToWorldTransform>(sorted[i].Key).Value.Position);
             }*/
 
+            //Please find out why more than keep count are spawning!!!
+
+            ecb = new EntityCommandBuffer(Allocator.Persistent);
             int keepCount = 0;
+            int additional = 0;
             Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
             {
                 keepCount++;
+
+                //Ensure that only to keep entities survive
+                if(keepCount > toKeep) 
+                {
+                    additional++;
+                    ecb.RemoveComponent(entity, typeof(KeepComponent));
+                    //ecb.AddComponent<DestroyComponent>(entity);
+                }
+            }).WithoutBurst().Run();
+
+            //keepCount = 0;
+            /*Entities.WithAll<KeepComponent>().ForEach((Entity entity) =>
+            {
+                keepCount++;
             }).Run();
+            */
+            keepCount -= additional;
+
+            ecb.Playback(EntityManager);
+            ecb.Dispose();
 
             SelectedMetric selectedMetric = new SelectedMetric { selected = keepCount };
             LoggerSystem.Logger.LogEpoch(simState.currentEpoch, selectedMetric);
@@ -210,21 +239,29 @@ public partial class SelectionSystem : SystemBase
             float P = pointers[index];
             int I = 0;
 
-            while(Sum(I) < P) 
+            while (Sum(I) < P)
             {
                 I++;
             }
 
             //Debug.Log(population[I].fitness);
             //toKeep.Add(population[I].entity);
-            ecb.AddComponent<KeepComponent>(index, population[I].entity);
+            if (I < population.Length) 
+            {
+                ecb.AddComponent<KeepComponent>(index, population[I].entity);
+            }
+            else 
+            {
+                ecb.AddComponent<KeepComponent>(index, population[population.Length-1].entity);
+            }
+            
         }
 
         [BurstCompile]
         private float Sum(int I) 
         {
             float sum = 0f;
-            for (int i = 0; i < I; i++)
+            for (int i = 0; i <= I; i++)
             {
                 sum += population[i].fitness;
             }

@@ -7,7 +7,7 @@ using Unity.Jobs;
 using Unity.Transforms;
 
 
-[UpdateAfter(typeof(MutationSystem))]
+[UpdateAfter(typeof(ApplySystem))]
 public partial class InputSystem : SystemBase
 {
     BufferLookup<SeeBufferComponent> _seeBufferLookup;

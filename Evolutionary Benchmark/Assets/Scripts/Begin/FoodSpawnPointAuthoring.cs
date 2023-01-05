@@ -4,13 +4,10 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-[assembly: RegisterGenericComponentType(typeof(SpawnPointAuthoring))]
-[assembly: RegisterGenericComponentType(typeof(SpawnPointComponent))]
+[assembly: RegisterGenericComponentType(typeof(FoodSpawnPointAuthoring))]
+[assembly: RegisterGenericComponentType(typeof(FoodSpawnPointComponent))]
 
-/// <summary>
-/// Convert spawnpoint gameobject to entity
-/// </summary>
-public class SpawnPointAuthoring : MonoBehaviour
+public class FoodSpawnPointAuthoring : MonoBehaviour
 {
     public uint seed;
     /// <summary>
@@ -39,15 +36,18 @@ public class SpawnPointAuthoring : MonoBehaviour
     public SpawnStrategy strategy;
 }
 
-public class SpawnPointBaker : Baker<SpawnPointAuthoring>
+public class FoodSpawnPointBaker : Baker<FoodSpawnPointAuthoring>
 {
-    public override void Bake(SpawnPointAuthoring authoring)
+    public override void Bake(FoodSpawnPointAuthoring authoring)
     {
-        AddComponent<SpawnPointComponent>(new SpawnPointComponent { random = new Unity.Mathematics.Random(authoring.seed), 
-        prefab = GetEntity(authoring.prefab),
-        boundary = authoring.boundary,
-        radius = authoring.radius,
-        strategy = authoring.strategy,
-        type= authoring.type});
+        AddComponent<FoodSpawnPointComponent>(new FoodSpawnPointComponent
+        {
+            random = new Unity.Mathematics.Random(authoring.seed),
+            prefab = GetEntity(authoring.prefab),
+            boundary = authoring.boundary,
+            radius = authoring.radius,
+            strategy = authoring.strategy,
+            type = authoring.type
+        });
     }
 }

@@ -8,7 +8,9 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 
-//[BurstCompile]
+/// <summary>
+/// System that is responsible for instantiating, re-positioning and reseting stats of entities
+/// </summary>
 [UpdateAfter(typeof(EpochTimer))]
 public partial class SpawnerSystem : SystemBase//ISystem
 {
@@ -16,30 +18,25 @@ public partial class SpawnerSystem : SystemBase//ISystem
     BufferLookup<TraitBufferComponent<int>> _intBufferLookup;
     BufferLookup<TraitBufferComponent<float>> _floatBufferLookup;
 
-    //[BurstCompile]
     protected override void OnCreate()//(ref SystemState state)
     {
         RequireForUpdate<SimStateComponent>();
 
+        //Intialize buffer lookup components
         _intBufferLookup = GetBufferLookup<TraitBufferComponent<int>>(false);
         _floatBufferLookup = GetBufferLookup<TraitBufferComponent<float>>(false);
     }
 
-    //[BurstCompile]
-    /*public void OnDestroy()//(ref SystemState state)
-    {
-
-    }*/
-
-   // [BurstCompile]
     protected override void OnUpdate()//(ref SystemState state)
     {
         bool success = SystemAPI.TryGetSingleton<SimStateComponent>(out SimStateComponent simState);
 
         if (success && simState.phase == Phase.start)
         {
-
+            //Get entity command buffer
             var ecb = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged).AsParallelWriter();
+
+
 
             NativeList<Entity> toKeepList = new NativeList<Entity>(AllocatorManager.TempJob);
             NativeList<RefRef<TransformAspect>> toKeepTransformList = new NativeList<RefRef<TransformAspect>>(AllocatorManager.TempJob);
@@ -53,27 +50,26 @@ public partial class SpawnerSystem : SystemBase//ISystem
             EntityCommandBuffer ecb2 = new EntityCommandBuffer(Allocator.TempJob);
             EntityCommandBuffer.ParallelWriter ecb2Parallel = ecb2.AsParallelWriter();
             
+            //Fetch components from entities marked as keep from previous generation and remove keep tag
             JobHandle handle2 = Entities.WithAll<KeepComponent>().ForEach((Entity entity/*, ref TransformAspect transform, ref HealthComponent health,
                 ref EnergyComponent energy*/, ref MaxHealthComponent maxHealth, ref MaxEnergyComponent maxEnergy) =>
             {
                 toKeepList.Add(entity);
-                
-                /*toKeepTransformList.Add(new RefRef<TransformAspect>(ref transform));
-                toKeepHealthComponentList.Add(new RefRef<HealthComponent>(ref health));
-                toKeepEnergyComponentList.Add(new RefRef<EnergyComponent>(ref energy));*/
                 toKeepMaxHealthComponentList.Add(new RefRef<MaxHealthComponent>(ref maxHealth));
                 toKeepMaxEnergyComponentList.Add(new RefRef<MaxEnergyComponent>(ref maxEnergy));
                 
                 ecb2.RemoveComponent<KeepComponent>(entity);
             }).Schedule(Dependency);
 
+            //Fetch components that need to be generated
+
             handle2.Complete();
 
-            //Entities.WithAll<>
+            //Apply changes made in command buffer
+            ecb2.Playback(EntityManager);
+            ecb2.Dispose();
 
             var toKeep = toKeepList.ToArray(Allocator.TempJob);
-            /*var toKeepHealth = toKeepHealthComponentList.ToArray(Allocator.Temp);
-            var toKeepEnergy = toKeepEnergyComponentList.ToArray(Allocator.Temp);*/
             var toKeepMaxHealth = toKeepMaxHealthComponentList.ToArray(Allocator.TempJob);
             var toKeepMaxEnergy= toKeepMaxEnergyComponentList.ToArray(Allocator.TempJob);
             //Spawn = Create new entity
@@ -87,47 +83,55 @@ public partial class SpawnerSystem : SystemBase//ISystem
 
             //Dispose of lists
             toKeepList.Dispose();
-            /*toKeepTransformList.Dispose();
-            toKeepHealthComponentList.Dispose();
-            toKeepEnergyComponentList.Dispose();*/
             toKeepMaxHealthComponentList.Dispose();
             toKeepMaxEnergyComponentList.Dispose();
 
-            //toGenerate.ToArray(Allocator.Temp);
-            //toGenerate.Dispose();
 
-            ecb2.Playback(EntityManager);
-            
-            ecb2.Dispose();
+
+            float fields = simState.fields;
 
             //Per spawner
-            int toSpawnSpawnCount = (int)(math.ceil(toSpawnCount / simState.fields));
+            var temp = math.ceil(toSpawnCount / fields);
+            //The number of entities to spawn new per spawner
+            int toSpawnSpawnCount = (int)(temp);
 
-            int toKeepSpawnCount = (int)(math.ceil(toKeep.Length / simState.fields));
+            //The number of entities to regenerate per spawner
+            int toKeepSpawnCount = (int)(math.ceil(toKeep.Length / fields));
 
-            int foodCount = (int)(math.ceil(simState.maxEntities / simState.fields));
-
+            //The number of food to spawn per spawner
+            int foodCount = (int)(math.ceil(simState.maxEntities / fields));
 
             _intBufferLookup.Update(this);
             _floatBufferLookup.Update(this);
 
-            JobHandle handle = new SpawnJob {ecb = ecb,
-                spawnCount= toSpawnSpawnCount,
-                toKeepSpawnCount=toKeepSpawnCount,
-                foodSpawnCount = foodCount,
+            ecb2 = new EntityCommandBuffer(Allocator.TempJob);
+            ecb2Parallel = ecb2.AsParallelWriter();
+
+            RefRW<SimStateComponent> state = SystemAPI.GetSingletonRW<SimStateComponent>();
+            JobHandle handle = new SpawnJob { ecb = ecb,
+                spawnCount = toSpawnSpawnCount,
+                maxToSpawnCount = toSpawnCount,
+                toKeepSpawnCount = toKeepSpawnCount,
                 toKeep = toKeep,
                 toKeepMaxEnergy = toKeepMaxEnergy,
                 toKeepMaxHealth = toKeepMaxHealth,
                 intBufferLookup = _intBufferLookup,
                 floatBufferLookup = _floatBufferLookup,
+                ecb2 = ecb2Parallel,
+                epoch = state.ValueRO.currentEpoch,
             }.ScheduleParallel(Dependency);
-            handle.Complete();
+
+
+            new FoodSpawnJob { ecb = ecb, foodSpawnCount = foodCount, maxToSpawnCount=toSpawnCount}.ScheduleParallel(handle).Complete();
 
             toKeep.Dispose();
             toKeepMaxEnergy.Dispose();
             toKeepMaxHealth.Dispose();
+            ecb2.Playback(EntityManager);
+            ecb2.Dispose();
 
-            RefRW<SimStateComponent> state = SystemAPI.GetSingletonRW<SimStateComponent>();
+            //Reset killed stats because they have been spawned new
+            state = SystemAPI.GetSingletonRW<SimStateComponent>();
             state.ValueRW.killedThisGen = 0;
 
         }
@@ -139,15 +143,18 @@ public partial class SpawnerSystem : SystemBase//ISystem
 
         public EntityCommandBuffer.ParallelWriter ecb;
 
+        public EntityCommandBuffer.ParallelWriter ecb2;
+
         [ReadOnly]
         public int spawnCount;
 
         [ReadOnly]
-        //How many entities from to KeepCount
-        public int toKeepSpawnCount;
+        public int maxToSpawnCount;
+
 
         [ReadOnly]
-        public int foodSpawnCount;
+        //How many entities from to KeepCount
+        public int toKeepSpawnCount;
 
         [NativeDisableParallelForRestriction]
         public NativeArray<Entity> toKeep;
@@ -169,12 +176,32 @@ public partial class SpawnerSystem : SystemBase//ISystem
         [NativeDisableParallelForRestriction]
         public BufferLookup<TraitBufferComponent<float>> floatBufferLookup;
 
+        [ReadOnly]
+        public int epoch;
 
         [BurstCompile]
         public void Execute(SpawnAspect aspect, [EntityInQueryIndex] int sortKey) 
         {
-            //, toKeepTransforms, toKeepHealth, toKeepEnergy
-            aspect.SpawnEntity(ecb, sortKey, spawnCount, toKeepSpawnCount, foodSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup);
+            aspect.SpawnEntity(ecb, ecb2, sortKey, spawnCount, maxToSpawnCount, toKeepSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup, epoch);
+        }
+    }
+
+    [BurstCompile]
+    private partial struct FoodSpawnJob : IJobEntity
+    {
+
+        public EntityCommandBuffer.ParallelWriter ecb;
+
+        [ReadOnly]
+        public int foodSpawnCount;
+
+        [ReadOnly]
+        public int maxToSpawnCount;
+
+        [BurstCompile]
+        public void Execute(FoodSpawnAspect aspect, [EntityInQueryIndex] int sortKey)
+        {
+            aspect.SpawnEntity(ecb, sortKey + maxToSpawnCount * 6, foodSpawnCount);
         }
     }
 }

@@ -47,33 +47,35 @@ public partial class DestroyerSystem : SystemBase
             //Destroy all entities with 0 health
             int killed = 0;
 
-            Entities.WithAll<HealthComponent>().WithNone<DestroyComponent>().ForEach((Entity entity, HealthComponent health) =>
+            if(simState.ValueRO.phase == Phase.running) 
             {
-                if (health.value <= 0f)
+                Entities.WithAll<HealthComponent>().WithNone<DestroyComponent>().ForEach((Entity entity, HealthComponent health) =>
                 {
-                    ecb2.AddComponent<DestroyComponent>(entity);
+                    if (health.value <= 0f)
+                    {
+                        ecb2.AddComponent<DestroyComponent>(entity);
 
-                    killed++;
+                        killed++;
+                    }
+                }).Run();
+
+                if (killed > 0)
+                {
+                    ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
+                    {
+                        currentEpoch = simState.ValueRO.currentEpoch,
+                        maxEntities = simState.ValueRO.maxEntities,
+                        maxEpochs = simState.ValueRO.maxEpochs,
+                        entityPrefab = simState.ValueRO.entityPrefab,
+                        epochDuration = simState.ValueRO.epochDuration,
+                        phase = simState.ValueRO.phase,
+                        timeElapsed = simState.ValueRO.timeElapsed,
+                        fields = simState.ValueRO.fields,
+                        killedThisGen = simState.ValueRO.killedThisGen + killed,
+                        survivePercent = simState.ValueRO.survivePercent
+                    });
                 }
-            }).Run();
-
-            if(killed > 0) 
-            {
-                ecb.SetComponent<SimStateComponent>(ent, new SimStateComponent
-                {
-                    currentEpoch = simState.ValueRO.currentEpoch,
-                    maxEntities = simState.ValueRO.maxEntities,
-                    maxEpochs = simState.ValueRO.maxEpochs,
-                    entityPrefab = simState.ValueRO.entityPrefab,
-                    epochDuration = simState.ValueRO.epochDuration,
-                    phase = simState.ValueRO.phase,
-                    timeElapsed = simState.ValueRO.timeElapsed,
-                    fields = simState.ValueRO.fields,
-                    killedThisGen = simState.ValueRO.killedThisGen + killed,
-                    survivePercent = simState.ValueRO.survivePercent
-                });
             }
-
 
             if (simState.ValueRO.phase == Phase.end) 
             {
