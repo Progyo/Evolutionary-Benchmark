@@ -61,9 +61,18 @@ public partial class SpawnerSystem : SystemBase//ISystem
                 ecb2.RemoveComponent<KeepComponent>(entity);
             }).Schedule(Dependency);
 
-            //Fetch components that need to be generated
 
             handle2.Complete();
+            Entity fittest= new Entity { Version = -100};
+            Entities.WithAll<BestInGenComponent>().ForEach((Entity entity) =>
+            {
+                fittest = entity;
+                ecb2.RemoveComponent<BestInGenComponent>(entity);
+            }).Run();
+
+            //Fetch components that need to be generated
+
+            
 
             //Apply changes made in command buffer
             ecb2.Playback(EntityManager);
@@ -99,7 +108,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
             int toKeepSpawnCount = (int)(math.ceil(toKeep.Length / fields));
 
             //The number of food to spawn per spawner
-            int foodCount = (int)(math.ceil(simState.maxEntities / fields * math.max(simState.currentEpoch/10, 0.5f))) ;
+            int foodCount = (int)(math.ceil(simState.maxEntities / fields * math.max(simState.currentEpoch/10, 1f))) ;
 
             _intBufferLookup.Update(this);
             _floatBufferLookup.Update(this);
@@ -119,6 +128,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
                 floatBufferLookup = _floatBufferLookup,
                 ecb2 = ecb2Parallel,
                 epoch = state.ValueRO.currentEpoch,
+                fittestEntity = fittest,
             }.ScheduleParallel(Dependency);
 
 
@@ -140,6 +150,8 @@ public partial class SpawnerSystem : SystemBase//ISystem
     [BurstCompile]
     private partial struct SpawnJob : IJobEntity 
     {
+
+        public Entity fittestEntity;
 
         public EntityCommandBuffer.ParallelWriter ecb;
 
@@ -182,7 +194,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
         [BurstCompile]
         public void Execute(SpawnAspect aspect, [EntityInQueryIndex] int sortKey) 
         {
-            aspect.SpawnEntity(ecb, ecb2, sortKey, spawnCount, maxToSpawnCount, toKeepSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup, epoch);
+            aspect.SpawnEntity(ecb, ecb2, sortKey, spawnCount, maxToSpawnCount, toKeepSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup, epoch, fittestEntity);
         }
     }
 

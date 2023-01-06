@@ -171,6 +171,13 @@ public partial class SelectionSystem : SystemBase
             JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 100, Dependency);
 
             handle.Complete();
+            //Mark the highest fitness
+            if(populationStruct.Length > 0)
+            {
+                ecb.AddComponent<BestInGenComponent>(populationStruct[0].entity, new BestInGenComponent());
+            }
+            
+
             populationStruct.Dispose();
 
             ecb.Playback(EntityManager);

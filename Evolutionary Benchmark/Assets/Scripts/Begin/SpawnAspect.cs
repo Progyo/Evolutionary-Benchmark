@@ -37,7 +37,7 @@ public readonly partial struct SpawnAspect : IAspect
     [BurstCompile]
     public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, EntityCommandBuffer.ParallelWriter ecb2, int sortKey, int newSpawnCount, int maxToSpawnCount, int toKeepSpawn,NativeArray<Entity> toKeep, /*NativeArray<RefRef<TransformAspect>> toKeepTransforms,
         NativeArray<RefRef<HealthComponent>> toKeepHealth, NativeArray<RefRef<EnergyComponent>> toKeepEnergy, */NativeArray<RefRef<MaxHealthComponent>> toKeepMaxHealth, NativeArray<RefRef<MaxEnergyComponent>> toKeepMaxEnergy,
-        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup, int epoch) 
+        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup, int epoch, Entity fittestEntity) 
     {
         //Define boundaries as min and max points
         float maxX = spawnPoint.ValueRO.boundary.z;
@@ -90,10 +90,17 @@ public readonly partial struct SpawnAspect : IAspect
                     }
                 }
 
+                Entity e;
+                if (fittestEntity.Version == -100)
+                {
+                    e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
+                }
+                else 
+                {
+                    //Create the entity creation command
+                    e = ecb.Instantiate(sortKey, fittestEntity);// ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
+                }
 
-
-                //Create the entity creation command
-                Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
                 ecb.SetSharedComponent<FieldIdSharedComponent>(sortKey, e, new FieldIdSharedComponent { value = spawnPoint.ValueRO.id});
 
 
