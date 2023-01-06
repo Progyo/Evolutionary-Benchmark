@@ -8,6 +8,6 @@ public struct KilledMetric : IMetric
 
     public string ToJsonString()
     {
-        return "'killed' : "+ killedThisGen;
+        return "\"killed\" : "+ killedThisGen;
     }
 }

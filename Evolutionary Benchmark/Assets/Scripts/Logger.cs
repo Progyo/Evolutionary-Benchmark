@@ -5,6 +5,7 @@ using Unity.Entities;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Mathematics;
+using System.IO;
 /*
 [BurstCompile]
 public static class Logger
@@ -173,19 +174,32 @@ public partial class LoggerSystem : SystemBase
         {
             string json = "{\n";
 
+            int outsideCount = 0;
+
             foreach(KeyValuePair<int,Dictionary<float,List<string>>> pair in cache) 
             {
-                json += pair.Key + ": {\n";
+                json += "\""+ pair.Key + "\": {\n";
 
+                int insideCount = 0;
                 if (pair.Value.ContainsKey(-1f)) 
                 {
                     foreach (string str in pair.Value[-1f])
                     {
-                        json += str + ",\n";
+                        insideCount++;
+                        if (insideCount < pair.Value[-1f].Count)
+                        {
+                            json += str + ",\n";
+                        }
+                        else
+                        {
+                            json += str + "\n";
+                        }
+                        
                     }
                 }
 
-                foreach(KeyValuePair<float,List<string>> pair2 in pair.Value) 
+                insideCount = 0;
+                foreach (KeyValuePair<float,List<string>> pair2 in pair.Value) 
                 {
                     if(pair2.Key != -1f) 
                     {
@@ -195,15 +209,37 @@ public partial class LoggerSystem : SystemBase
                         {
                             json += str + "\n";
                         }
+                        insideCount++;
 
-                        json += "],\n";
+                        if(insideCount < pair.Value.Count) 
+                        {
+                            json += "],\n";
+                        }
+                        else 
+                        {
+                            json += "]\n";
+                        }
+                        
                     }
 
                 }
-                json += "},\n";
+                outsideCount++;
+
+                if(outsideCount < cache.Count) 
+                {
+                    json += "},\n";
+                }
+                else 
+                {
+                    json += "}\n";
+                }
             }
 
-            return json+"}\n";
+            json += "}\n";
+
+            File.WriteAllText("evolution_benchmark_data.json", json);
+
+            return json;
         }
     }
 

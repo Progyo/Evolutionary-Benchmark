@@ -11,6 +11,6 @@ public struct SpeedMetric : IMetric
 
     public string ToJsonString()
     {
-        return "'speed' : {'average': " + totalSpeed / (float)totalCount + ", 'top': " + topSpeed+ ", 'worst': " + worstSpeed+ "}";
+        return "\"speed\" : {\"average\": " + totalSpeed / (float)totalCount + ", \"top\": " + topSpeed+ ", \"worst\": " + worstSpeed+ "}";
     }
 }

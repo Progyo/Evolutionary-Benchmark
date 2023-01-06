@@ -47,7 +47,7 @@ public struct AverageAndMaxFitnessMetric : IMetric
 
     public string ToJsonString()
     {
-        return "'fitness' : {'average': "+averageFitness+", 'max': "+maxFitness+"}";
+        return "\"fitness\" : {\"average\": "+averageFitness+", \"max\": "+maxFitness+"}";
     }
 }
 

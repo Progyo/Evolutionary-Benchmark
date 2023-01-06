@@ -14,6 +14,6 @@ public struct SizeMetric : IMetric
 
     public string ToJsonString()
     {
-        return "'size' : {'average': " + totalSize/(float)totalCount + ", 'top': " + topSize + ", 'worst': " + worstSize + "}";
+        return "\"size\" : {\"average\": " + totalSize/(float)totalCount + ", \"top\": " + topSize + ", \"worst\": " + worstSize + "}";
     }
 }

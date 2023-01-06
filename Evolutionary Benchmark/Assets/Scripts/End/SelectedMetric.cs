@@ -8,6 +8,6 @@ public struct SelectedMetric : IMetric
 
     public string ToJsonString()
     {
-        return "'selected' : " + selected;
+        return "\"selected\" : " + selected;
     }
 }
