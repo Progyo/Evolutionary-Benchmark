@@ -94,7 +94,7 @@ public readonly partial struct SpawnAspect : IAspect
 
                 //Create the entity creation command
                 Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
-
+                ecb.SetSharedComponent<FieldIdSharedComponent>(sortKey, e, new FieldIdSharedComponent { value = spawnPoint.ValueRO.id});
 
 
                 //int defaultSize = 10;// +epoch*5;
@@ -124,6 +124,8 @@ public readonly partial struct SpawnAspect : IAspect
 
                 Entity e = toKeep[index];
                 float3 pos = transformRef.ValueRO.Value.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX, maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
+
+                ecb.SetSharedComponent<FieldIdSharedComponent>(sortKey, e, new FieldIdSharedComponent { value = spawnPoint.ValueRO.id });
 
                 //Set the transform
                 UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = transformRef.ValueRO.Value.Scale };
@@ -182,6 +184,7 @@ public readonly partial struct FoodSpawnAspect : IAspect
                 UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = 1f };
                 Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
                 ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
+                ecb.SetSharedComponent<FieldIdSharedComponent>(sortKey, e, new FieldIdSharedComponent { value = spawnPoint.ValueRO.id });
             }
         }
 

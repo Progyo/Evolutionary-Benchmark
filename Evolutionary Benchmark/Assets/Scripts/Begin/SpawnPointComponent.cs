@@ -52,6 +52,12 @@ public struct SpawnPointComponent : IComponentData
     /// How the entites should be spawned
     /// </summary>
     public SpawnStrategy strategy;
+
+
+    /// <summary>
+    /// The id of the field used to mark entities
+    /// </summary>
+    public int id;
 }
 
 /// <summary>
@@ -86,4 +92,9 @@ public struct FoodSpawnPointComponent : IComponentData
     /// How the entites should be spawned
     /// </summary>
     public SpawnStrategy strategy;
+
+    /// <summary>
+    /// The id of the field used to mark entities
+    /// </summary>
+    public int id;
 }

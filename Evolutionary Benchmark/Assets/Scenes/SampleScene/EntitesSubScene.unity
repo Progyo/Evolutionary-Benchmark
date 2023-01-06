@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -177,6 +177,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 50
 --- !u!1 &20472166
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +232,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 60
 --- !u!1 &42102599
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,6 +395,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 7
 --- !u!1 &57912247
 GameObject:
   m_ObjectHideFlags: 0
@@ -555,6 +558,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 37
 --- !u!1 &83945688
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,6 +721,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 36
 --- !u!1 &104981021
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,6 +776,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 52
 --- !u!1 &109611591
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,6 +831,90 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 26
+--- !u!1 &112160115
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 112160116}
+  - component: {fileID: 112160118}
+  - component: {fileID: 112160117}
+  m_Layer: 0
+  m_Name: Renderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &112160116
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112160115}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 0.45199, y: 0.45199, z: 0.45199}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 724047323}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &112160117
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112160115}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 693e3d2409a6e4d43ad7818f5cc92208, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &112160118
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 112160115}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &133303442
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,6 +969,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 4
 --- !u!1 &137375246
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,6 +1024,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 38
 --- !u!1 &163184975
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,6 +1079,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 17
 --- !u!1 &168155473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1257,6 +1350,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 47
 --- !u!1 &219274669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1405,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 26
 --- !u!1 &220371960
 GameObject:
   m_ObjectHideFlags: 0
@@ -1365,6 +1460,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 37
 --- !u!1 &224786792
 GameObject:
   m_ObjectHideFlags: 0
@@ -1404,6 +1500,7 @@ MonoBehaviour:
     w: 0
   radius: 0
   strategy: 0
+  id: 0
 --- !u!4 &224786794
 Transform:
   m_ObjectHideFlags: 0
@@ -1473,6 +1570,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 22
 --- !u!1 &256137367
 GameObject:
   m_ObjectHideFlags: 0
@@ -1635,6 +1733,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 51
 --- !u!1 &272980835
 GameObject:
   m_ObjectHideFlags: 0
@@ -1689,6 +1788,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 43
 --- !u!1 &274414933
 GameObject:
   m_ObjectHideFlags: 0
@@ -1743,6 +1843,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 14
 --- !u!1 &276300475
 GameObject:
   m_ObjectHideFlags: 0
@@ -1797,6 +1898,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 5
 --- !u!1 &293450816
 GameObject:
   m_ObjectHideFlags: 0
@@ -1851,6 +1953,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 40
 --- !u!1 &300735251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1905,6 +2008,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 46
 --- !u!1 &309736811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1959,6 +2063,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 34
 --- !u!1 &314176862
 GameObject:
   m_ObjectHideFlags: 0
@@ -2013,6 +2118,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 0
 --- !u!1 &325740076
 GameObject:
   m_ObjectHideFlags: 0
@@ -2175,6 +2281,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 59
 --- !u!1 &331546665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2229,6 +2336,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 63
 --- !u!1 &363782470
 GameObject:
   m_ObjectHideFlags: 0
@@ -2283,6 +2391,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 45
 --- !u!1 &388338800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2337,6 +2446,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 18
 --- !u!1 &389595525
 GameObject:
   m_ObjectHideFlags: 0
@@ -2391,6 +2501,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 56
 --- !u!1 &399342138
 GameObject:
   m_ObjectHideFlags: 0
@@ -2445,6 +2556,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 23
 --- !u!1 &416184125
 GameObject:
   m_ObjectHideFlags: 0
@@ -2499,6 +2611,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 33
 --- !u!1 &426507487
 GameObject:
   m_ObjectHideFlags: 0
@@ -2553,6 +2666,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 16
 --- !u!1 &426520688
 GameObject:
   m_ObjectHideFlags: 0
@@ -2715,6 +2829,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 55
 --- !u!1 &468825992
 GameObject:
   m_ObjectHideFlags: 0
@@ -2769,6 +2884,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 21
 --- !u!1 &480149452
 GameObject:
   m_ObjectHideFlags: 0
@@ -2931,6 +3047,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 39
 --- !u!1 &497392033
 GameObject:
   m_ObjectHideFlags: 0
@@ -2985,6 +3102,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 17
 --- !u!1 &515073923
 GameObject:
   m_ObjectHideFlags: 0
@@ -3039,6 +3157,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 33
 --- !u!1 &529683687
 GameObject:
   m_ObjectHideFlags: 0
@@ -3093,6 +3212,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 10
 --- !u!1 &536014186
 GameObject:
   m_ObjectHideFlags: 0
@@ -3147,6 +3267,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 27
 --- !u!1 &537603681
 GameObject:
   m_ObjectHideFlags: 0
@@ -3201,6 +3322,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 53
 --- !u!1 &552281055
 GameObject:
   m_ObjectHideFlags: 0
@@ -3255,6 +3377,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 11
 --- !u!1 &560879068
 GameObject:
   m_ObjectHideFlags: 0
@@ -3417,6 +3540,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 61
 --- !u!1 &589747392
 GameObject:
   m_ObjectHideFlags: 0
@@ -3471,6 +3595,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 13
 --- !u!1 &596257998
 GameObject:
   m_ObjectHideFlags: 0
@@ -3525,6 +3650,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 44
 --- !u!1 &617364122
 GameObject:
   m_ObjectHideFlags: 0
@@ -3579,6 +3705,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 23
 --- !u!1 &625139934
 GameObject:
   m_ObjectHideFlags: 0
@@ -3741,6 +3868,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 46
 --- !u!1 &649821028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3795,6 +3923,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 21
 --- !u!1 &656839272
 GameObject:
   m_ObjectHideFlags: 0
@@ -3849,6 +3978,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 54
 --- !u!1 &661334023
 GameObject:
   m_ObjectHideFlags: 0
@@ -3903,6 +4033,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 6
 --- !u!1 &674371266
 GameObject:
   m_ObjectHideFlags: 0
@@ -3957,6 +4088,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 16
 --- !u!1 &684221699
 GameObject:
   m_ObjectHideFlags: 0
@@ -4011,6 +4143,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 8
 --- !u!1 &714207155
 GameObject:
   m_ObjectHideFlags: 0
@@ -4065,6 +4198,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 11
 --- !u!1 &716715684
 GameObject:
   m_ObjectHideFlags: 0
@@ -4173,6 +4307,52 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 38
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &724047322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 724047323}
+  - component: {fileID: 724047324}
+  m_Layer: 0
+  m_Name: Food
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &724047323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724047322}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 31.2, y: 0, z: 4.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 112160116}
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &724047324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724047322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e755022a40a8a604caadb14fca4ff54f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nurishment: 10
 --- !u!1 &742418058
 GameObject:
   m_ObjectHideFlags: 0
@@ -4335,6 +4515,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 57
 --- !u!1 &782949152
 GameObject:
   m_ObjectHideFlags: 0
@@ -4389,6 +4570,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 35
 --- !u!1 &804804980
 GameObject:
   m_ObjectHideFlags: 0
@@ -4659,6 +4841,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 62
 --- !u!1 &822248108
 GameObject:
   m_ObjectHideFlags: 0
@@ -4713,6 +4896,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 30
 --- !u!1 &823894868
 GameObject:
   m_ObjectHideFlags: 0
@@ -4875,6 +5059,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 6
 --- !u!1 &847745564
 GameObject:
   m_ObjectHideFlags: 0
@@ -5037,6 +5222,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 53
 --- !u!1 &865375716
 GameObject:
   m_ObjectHideFlags: 0
@@ -5199,6 +5385,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 43
 --- !u!1 &874230449
 GameObject:
   m_ObjectHideFlags: 0
@@ -5361,6 +5548,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 58
 --- !u!1 &897906207
 GameObject:
   m_ObjectHideFlags: 0
@@ -5523,6 +5711,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 25
 --- !u!1 &914482933
 GameObject:
   m_ObjectHideFlags: 0
@@ -5901,6 +6090,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 24
 --- !u!1 &943574373
 GameObject:
   m_ObjectHideFlags: 0
@@ -6171,6 +6361,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 10
 --- !u!1 &1001997692
 GameObject:
   m_ObjectHideFlags: 0
@@ -6333,6 +6524,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 48
 --- !u!1 &1005697634
 GameObject:
   m_ObjectHideFlags: 0
@@ -6387,6 +6579,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 62
 --- !u!1 &1010495384
 GameObject:
   m_ObjectHideFlags: 0
@@ -6426,6 +6619,7 @@ MonoBehaviour:
     w: 0
   radius: 0
   strategy: 0
+  id: 0
 --- !u!4 &1010495386
 Transform:
   m_ObjectHideFlags: 0
@@ -6603,6 +6797,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 32
 --- !u!1 &1060901695
 GameObject:
   m_ObjectHideFlags: 0
@@ -6657,6 +6852,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 47
 --- !u!1 &1061510054
 GameObject:
   m_ObjectHideFlags: 0
@@ -7035,6 +7231,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 29
 --- !u!1 &1087405402
 GameObject:
   m_ObjectHideFlags: 0
@@ -7197,6 +7394,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 44
 --- !u!1 &1098220554
 GameObject:
   m_ObjectHideFlags: 0
@@ -7251,6 +7449,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 15
 --- !u!1 &1129837966
 GameObject:
   m_ObjectHideFlags: 0
@@ -7737,6 +7936,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 7
 --- !u!1 &1164313922
 GameObject:
   m_ObjectHideFlags: 0
@@ -7791,6 +7991,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 1
 --- !u!1 &1183337378
 GameObject:
   m_ObjectHideFlags: 0
@@ -7845,6 +8046,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 39
 --- !u!1 &1186575742
 GameObject:
   m_ObjectHideFlags: 0
@@ -7899,6 +8101,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 27
 --- !u!1 &1215603304
 GameObject:
   m_ObjectHideFlags: 0
@@ -7953,6 +8156,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 59
 --- !u!1 &1225162926
 GameObject:
   m_ObjectHideFlags: 0
@@ -8007,6 +8211,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 20
 --- !u!1 &1245849796
 GameObject:
   m_ObjectHideFlags: 0
@@ -8061,6 +8266,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 60
 --- !u!1 &1247063335
 GameObject:
   m_ObjectHideFlags: 0
@@ -8115,6 +8321,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 45
 --- !u!1 &1258298311
 GameObject:
   m_ObjectHideFlags: 0
@@ -8169,6 +8376,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 55
 --- !u!1 &1265343388
 GameObject:
   m_ObjectHideFlags: 0
@@ -8223,6 +8431,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 22
 --- !u!1 &1271999369
 GameObject:
   m_ObjectHideFlags: 0
@@ -8277,6 +8486,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 49
 --- !u!1 &1280872461
 GameObject:
   m_ObjectHideFlags: 0
@@ -8439,6 +8649,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 8
 --- !u!1 &1347036061
 GameObject:
   m_ObjectHideFlags: 0
@@ -8493,6 +8704,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 3
 --- !u!1 &1353053300
 GameObject:
   m_ObjectHideFlags: 0
@@ -8655,6 +8867,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 41
 --- !u!1 &1380558963
 GameObject:
   m_ObjectHideFlags: 0
@@ -8871,6 +9084,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 61
 --- !u!1 &1422626423
 GameObject:
   m_ObjectHideFlags: 0
@@ -9033,6 +9247,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 9
 --- !u!1 &1425735169
 GameObject:
   m_ObjectHideFlags: 0
@@ -9087,6 +9302,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 56
 --- !u!1 &1437359984
 GameObject:
   m_ObjectHideFlags: 0
@@ -9141,6 +9357,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 30
 --- !u!1 &1438949887
 GameObject:
   m_ObjectHideFlags: 0
@@ -9303,6 +9520,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 32
 --- !u!1 &1447941990
 GameObject:
   m_ObjectHideFlags: 0
@@ -9357,6 +9575,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 35
 --- !u!1 &1464524635
 GameObject:
   m_ObjectHideFlags: 0
@@ -9411,6 +9630,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 42
 --- !u!1 &1464840474
 GameObject:
   m_ObjectHideFlags: 0
@@ -9465,6 +9685,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 4
 --- !u!1 &1478257314
 GameObject:
   m_ObjectHideFlags: 0
@@ -9627,6 +9848,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 19
 --- !u!1 &1496093720
 GameObject:
   m_ObjectHideFlags: 0
@@ -10005,6 +10227,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 9
 --- !u!1 &1510313193
 GameObject:
   m_ObjectHideFlags: 0
@@ -10044,6 +10267,7 @@ MonoBehaviour:
     w: 0
   radius: 0
   strategy: 0
+  id: 0
 --- !u!4 &1510313195
 Transform:
   m_ObjectHideFlags: 0
@@ -10329,6 +10553,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 36
 --- !u!1 &1572098513
 GameObject:
   m_ObjectHideFlags: 0
@@ -10383,6 +10608,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 24
 --- !u!1 &1599942970
 GameObject:
   m_ObjectHideFlags: 0
@@ -10437,6 +10663,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 20
 --- !u!1 &1608203410
 GameObject:
   m_ObjectHideFlags: 0
@@ -10815,6 +11042,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 5
 --- !u!1 &1667237341
 GameObject:
   m_ObjectHideFlags: 0
@@ -10869,6 +11097,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 31
 --- !u!1 &1672930513
 GameObject:
   m_ObjectHideFlags: 0
@@ -10923,6 +11152,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 38
 --- !u!1 &1683121733
 GameObject:
   m_ObjectHideFlags: 0
@@ -10977,6 +11207,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 41
 --- !u!1 &1683703280
 GameObject:
   m_ObjectHideFlags: 0
@@ -11139,6 +11370,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 63
 --- !u!1 &1695560190
 GameObject:
   m_ObjectHideFlags: 0
@@ -11409,6 +11641,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 29
 --- !u!1 &1716031683
 GameObject:
   m_ObjectHideFlags: 0
@@ -11463,6 +11696,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 1
 --- !u!1 &1718261860
 GameObject:
   m_ObjectHideFlags: 0
@@ -12057,6 +12291,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 42
 --- !u!1 &1786609887
 GameObject:
   m_ObjectHideFlags: 0
@@ -12111,6 +12346,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 34
 --- !u!1 &1792994651
 GameObject:
   m_ObjectHideFlags: 0
@@ -12165,6 +12401,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 13
 --- !u!1 &1799768705
 GameObject:
   m_ObjectHideFlags: 0
@@ -12219,6 +12456,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 28
 --- !u!1 &1803680109
 GameObject:
   m_ObjectHideFlags: 0
@@ -12273,6 +12511,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 31
 --- !u!1 &1815313256
 GameObject:
   m_ObjectHideFlags: 0
@@ -12327,6 +12566,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 54
 --- !u!1 &1831242421
 GameObject:
   m_ObjectHideFlags: 0
@@ -12597,6 +12837,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 19
 --- !u!1 &1853653383
 GameObject:
   m_ObjectHideFlags: 0
@@ -12651,6 +12892,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 12
 --- !u!1 &1908545911
 GameObject:
   m_ObjectHideFlags: 0
@@ -12690,6 +12932,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 0
 --- !u!4 &1908545913
 Transform:
   m_ObjectHideFlags: 0
@@ -12867,6 +13110,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 12
 --- !u!1 &1961090977
 GameObject:
   m_ObjectHideFlags: 0
@@ -12921,6 +13165,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 25
 --- !u!1 &1974992614
 GameObject:
   m_ObjectHideFlags: 0
@@ -12975,6 +13220,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 49
 --- !u!1 &1976181932
 GameObject:
   m_ObjectHideFlags: 0
@@ -13029,6 +13275,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 28
 --- !u!1 &1977173267
 GameObject:
   m_ObjectHideFlags: 0
@@ -13083,6 +13330,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 51
 --- !u!1 &2010180628
 GameObject:
   m_ObjectHideFlags: 0
@@ -13245,6 +13493,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 2
 --- !u!1 &2027184933
 GameObject:
   m_ObjectHideFlags: 0
@@ -13299,6 +13548,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 40
 --- !u!1 &2040399103
 GameObject:
   m_ObjectHideFlags: 0
@@ -13353,6 +13603,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 48
 --- !u!1 &2046617247
 GameObject:
   m_ObjectHideFlags: 0
@@ -13407,6 +13658,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 2
 --- !u!1 &2047721674
 GameObject:
   m_ObjectHideFlags: 0
@@ -13461,6 +13713,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 18
 --- !u!1 &2054231175
 GameObject:
   m_ObjectHideFlags: 0
@@ -13515,6 +13768,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 15
 --- !u!1 &2057801711
 GameObject:
   m_ObjectHideFlags: 0
@@ -13569,6 +13823,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 3
 --- !u!1 &2058914833
 GameObject:
   m_ObjectHideFlags: 0
@@ -13623,6 +13878,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 50
 --- !u!1 &2059744329
 GameObject:
   m_ObjectHideFlags: 0
@@ -13677,6 +13933,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 58
 --- !u!1 &2072786633
 GameObject:
   m_ObjectHideFlags: 0
@@ -13947,6 +14204,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 57
 --- !u!1 &2108086146
 GameObject:
   m_ObjectHideFlags: 0
@@ -14109,6 +14367,7 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
+  id: 14
 --- !u!1 &2134946738
 GameObject:
   m_ObjectHideFlags: 0
@@ -14163,81 +14422,4 @@ MonoBehaviour:
     w: 25
   radius: 0
   strategy: 0
---- !u!1001 &3537981471948231365
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 3537981472366085913, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: nurishment
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 31.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 4.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085918, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3537981472366085919, guid: 79d84a8e5accabb45b05d039f7253d05,
-        type: 3}
-      propertyPath: m_Name
-      value: Food
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 79d84a8e5accabb45b05d039f7253d05, type: 3}
+  id: 52

@@ -3,6 +3,50 @@
 "killed" : 4096,
 "size" : {"average": NaN, "top": 0, "worst": 0},
 "speed" : {"average": NaN, "top": 0, "worst": 0},
+"selected" : 0,
+"killed" : 4096,
+"size" : {"average": NaN, "top": 0, "worst": 0},
+"speed" : {"average": NaN, "top": 0, "worst": 0},
 "selected" : 0
+},
+"1": {
+"fitness" : {"average": 0.2435502, "max": 0.7392679},
+"killed" : 22,
+"size" : {"average": 10, "top": 10, "worst": 10},
+"speed" : {"average": 3.451171, "top": 3.451159, "worst": 3.451159},
+"selected" : 2033,
+"fitness" : {"average": 0.2381425, "max": 0.7392679},
+"killed" : 23,
+"size" : {"average": 10, "top": 10, "worst": 10},
+"speed" : {"average": 3.451171, "top": 3.451159, "worst": 3.451159},
+"selected" : 2031
+},
+"2": {
+"fitness" : {"average": 0.2438921, "max": 0.9975287},
+"killed" : 123,
+"size" : {"average": 8.928769, "top": 6, "worst": 10},
+"speed" : {"average": 3.844105, "top": 1.724799, "worst": 5.846069},
+"selected" : 1949
+},
+"3": {
+"fitness" : {"average": 0.2196164, "max": 0.9996816},
+"killed" : 497,
+"size" : {"average": 10.24382, "top": 10, "worst": 17},
+"speed" : {"average": 3.699225, "top": 0.1, "worst": 2.979842},
+"selected" : 1759
+},
+"4": {
+"fitness" : {"average": 0.2325876, "max": 0.9996155},
+"killed" : 663,
+"size" : {"average": 12.05881, "top": 7, "worst": 22},
+"speed" : {"average": 3.391917, "top": 0.2044775, "worst": 2.37817},
+"selected" : 1609
+},
+"5": {
+"fitness" : {"average": 0.3588195, "max": 0.9997015},
+"killed" : 1789,
+"size" : {"average": 8.449935, "top": 10, "worst": 22},
+"speed" : {"average": 3.606817, "top": 0.1, "worst": 2.37817},
+"selected" : 1497
 }
 }

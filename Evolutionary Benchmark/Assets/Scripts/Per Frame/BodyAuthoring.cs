@@ -55,5 +55,7 @@ public class BodyBaker : Baker<BodyAuthoring>
         AppendToBuffer<TraitBufferComponent<float>>(new TraitBufferComponent<float> { traitType = TraitType.speed, value = authoring.speed, maxValue = 10f, minValue = 0.1f });
         AddBuffer<TraitBufferComponent<int>>();
         AppendToBuffer<TraitBufferComponent<int>>(new TraitBufferComponent<int> { traitType = TraitType.size, value = authoring.size, maxValue = 50, minValue = 3 });
+
+        AddSharedComponent<FieldIdSharedComponent>(new FieldIdSharedComponent { value = -1 });
     }
 }

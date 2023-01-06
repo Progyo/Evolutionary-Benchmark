@@ -37,6 +37,11 @@ public class SpawnPointAuthoring : MonoBehaviour
     /// How the entites should be spawned
     /// </summary>
     public SpawnStrategy strategy;
+
+    /// <summary>
+    /// The id of the field used to mark entities
+    /// </summary>
+    public int id;
 }
 
 public class SpawnPointBaker : Baker<SpawnPointAuthoring>
@@ -48,6 +53,7 @@ public class SpawnPointBaker : Baker<SpawnPointAuthoring>
         boundary = authoring.boundary,
         radius = authoring.radius,
         strategy = authoring.strategy,
-        type= authoring.type});
+        type= authoring.type,
+        id = authoring.id});
     }
 }

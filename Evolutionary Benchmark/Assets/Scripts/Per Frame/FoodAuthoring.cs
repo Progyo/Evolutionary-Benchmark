@@ -16,6 +16,7 @@ public class FoodBaker : Baker<FoodAuthoring>
     {
         AddComponent<EntityTypeComponent>(new EntityTypeComponent { value = EntityType.food });
         AddComponent<FoodComponent>(new FoodComponent { value = authoring.nurishment });
+        AddSharedComponent<FieldIdSharedComponent>(new FieldIdSharedComponent { value = -1 });
     }
 }
 
