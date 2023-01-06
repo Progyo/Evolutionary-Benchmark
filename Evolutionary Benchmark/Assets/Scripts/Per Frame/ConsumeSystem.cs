@@ -17,6 +17,7 @@ public partial struct ConsumeSystem : ISystem
 
     ComponentTypeHandle<EatenByComponent> _eatenByTypeHandle;
     ComponentTypeHandle<FoodComponent> _foodTypeHandle;
+
     EntityTypeHandle _entityTypeHandle;
     //BufferLookup<Child> childLookup;
 
@@ -79,7 +80,7 @@ public partial struct EatJob : IJobEntity
 */
 
 [BurstCompile]
-public struct EatJob : IJobChunk
+public unsafe struct EatJob : IJobChunk
 {
 
     public ComponentTypeHandle<EatenByComponent> eatenByTypeHandle;
@@ -102,8 +103,9 @@ public struct EatJob : IJobChunk
         var chunkEatenBy = chunk.GetNativeArray(eatenByTypeHandle);
         var entities = chunk.GetNativeArray(entityTypeHandle);
         var chunkFood = chunk.GetNativeArray(foodTypeHandle);
+        //var foodConsumed = chunk.GetNativeArray();
 
-        if(entities.Length > 0 && chunkEatenBy.Length > 0 && chunkFood.Length > 0) 
+        if (entities.Length > 0 && chunkEatenBy.Length > 0 && chunkFood.Length > 0) 
         {
             for (int i = 0, chunkEntityCount = chunk.Count; i < chunkEntityCount; i++)
             {
@@ -152,6 +154,7 @@ public struct EatJob : IJobChunk
 
         eaten[index].energy.ValueRW.value = energy + energyToAdd;
         eaten[index].health.ValueRW.value = math.min(health + healthToAdd, maxHealth);
+        eaten[index].foodConsumed.ValueRW.value++;
 
         /*bool success = children.TryGetBuffer(entities[index], out DynamicBuffer<Child> buffer);
 

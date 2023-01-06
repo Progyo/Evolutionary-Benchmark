@@ -28,6 +28,7 @@ public partial struct EvaluationSystem : ISystem
     ComponentTypeHandle<HealthComponent> _healthTypeHandle;
     ComponentTypeHandle<MaxEnergyComponent> _maxEnergyTypeHandle;
     ComponentTypeHandle<MaxHealthComponent> _maxHealthTypeHandle;
+    ComponentTypeHandle<FoodConsumedComponent> _foodConsumedTypeHandle;
 
 
     EntityTypeHandle _entityTypeHandle;
@@ -57,7 +58,7 @@ public partial struct EvaluationSystem : ISystem
         _healthTypeHandle = state.GetComponentTypeHandle<HealthComponent>(true);
         _maxEnergyTypeHandle = state.GetComponentTypeHandle<MaxEnergyComponent>(true);
         _maxHealthTypeHandle = state.GetComponentTypeHandle<MaxHealthComponent>(true);
-
+        _foodConsumedTypeHandle = state.GetComponentTypeHandle<FoodConsumedComponent>(true);
 
         _intBufferLookup = state.GetBufferLookup<TraitBufferComponent<int>>(true);
         _floatBufferLookup = state.GetBufferLookup<TraitBufferComponent<float>>(true);
@@ -94,6 +95,7 @@ public partial struct EvaluationSystem : ISystem
             _healthTypeHandle.Update(ref state);
             _maxEnergyTypeHandle.Update(ref state);
             _maxHealthTypeHandle.Update(ref state);
+            _foodConsumedTypeHandle.Update(ref state);
 
 
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -114,6 +116,7 @@ public partial struct EvaluationSystem : ISystem
                 entityTypeHandle = _entityTypeHandle,
                 maxEnergyTypeHandle = _maxEnergyTypeHandle,
                 maxHealthTypeHandle = _maxHealthTypeHandle,
+                foodConsumedTypeHandle = _foodConsumedTypeHandle,
                 entityTypeTypeHandle = _entityTypeTypeHandle,
                 ecb = ecbParallel,
                 epoch = simState.ValueRO.currentEpoch,
@@ -154,6 +157,8 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
     public ComponentTypeHandle<MaxEnergyComponent> maxEnergyTypeHandle;
     [ReadOnly]
     public ComponentTypeHandle<MaxHealthComponent> maxHealthTypeHandle;
+    [ReadOnly]
+    public ComponentTypeHandle<FoodConsumedComponent> foodConsumedTypeHandle;
 
     public EntityTypeHandle entityTypeHandle;
 
@@ -189,7 +194,10 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
         var chunkHealth = chunk.GetNativeArray(healthTypeHandle);
         var chunkMaxEnergy = chunk.GetNativeArray(maxEnergyTypeHandle);
         var chunkMaxHealth = chunk.GetNativeArray(maxHealthTypeHandle);
+        var chunkFoodConsumed = chunk.GetNativeArray(foodConsumedTypeHandle);
+
         var chunkEntityType = chunk.GetNativeArray(entityTypeTypeHandle);
+        
 
 
         NativeArray<Entity> entities = chunk.GetNativeArray(entityTypeHandle);
@@ -212,6 +220,7 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
                 RefRW<HealthComponent> health = new RefRW<HealthComponent>(chunkHealth, i);
                 RefRW<MaxEnergyComponent> maxEnergy = new RefRW<MaxEnergyComponent>(chunkMaxEnergy, i);
                 RefRW<MaxHealthComponent> maxHealth = new RefRW<MaxHealthComponent>(chunkMaxHealth, i);
+                RefRW<FoodConsumedComponent> foodConsumed = new RefRW<FoodConsumedComponent>(chunkFoodConsumed, i);
                 RefRW<Entity> entity = new RefRW<Entity>(entities, i);
 
                 evalFunc.transform = transform;
@@ -223,6 +232,7 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
                 evalFunc.health = health;
                 evalFunc.maxHealth = maxHealth;
                 evalFunc.entity = entity;
+                evalFunc.foodEaten = foodConsumed;
 
                 float fitness = evalFunc.Evaluate();
 
@@ -255,6 +265,7 @@ public unsafe struct EvaluateJob<EvalFunc> : IJobChunk where EvalFunc : struct, 
         chunkHealth.Dispose();
         chunkMaxEnergy.Dispose();
         chunkMaxHealth.Dispose();
+        chunkFoodConsumed.Dispose();
         chunkEntityType.Dispose();
     }
 
@@ -280,6 +291,8 @@ public interface IEvaluate
     public RefRW<MaxHealthComponent> maxHealth { get; set; }
     public BufferLookup<TraitBufferComponent<int>> intLookup { get; set; }
     public BufferLookup<TraitBufferComponent<float>> floatLookup { get; set; }
+
+    public RefRW<FoodConsumedComponent> foodEaten { get; set; }
 
     public float Evaluate();
 }

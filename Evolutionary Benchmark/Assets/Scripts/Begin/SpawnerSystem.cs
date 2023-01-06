@@ -99,7 +99,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
             int toKeepSpawnCount = (int)(math.ceil(toKeep.Length / fields));
 
             //The number of food to spawn per spawner
-            int foodCount = (int)(math.ceil(simState.maxEntities / fields)) * 4;
+            int foodCount = (int)(math.ceil(simState.maxEntities / fields * math.max(simState.currentEpoch/10, 0.5f))) ;
 
             _intBufferLookup.Update(this);
             _floatBufferLookup.Update(this);

@@ -61,21 +61,55 @@ public readonly partial struct SpawnAspect : IAspect
                 //Set position to some random position in boundaries
                 float3 pos =  transformRef.ValueRO.Value.Position + new float3(spawnPoint.ValueRW.random.NextFloat(minX,maxX), 0f, spawnPoint.ValueRW.random.NextFloat(minY, maxY));
 
+
+
+                //Randomize speed and size values for newly spawned
+                bool success = intBufferLookup.TryGetBuffer(spawnPoint.ValueRO.prefab, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
+
+                if (success)
+                {
+                    for (int j = 0; j < intBuffer.Length; j++)
+                    {
+                        if (intBuffer[j].traitType == TraitType.size)
+                        {
+                            intBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextInt(intBuffer[j].minValue, math.max(intBuffer[j].minValue, intBuffer[j].maxValue/2));
+                        }
+                    }
+                }
+
+                success = floatBufferLookup.TryGetBuffer(spawnPoint.ValueRO.prefab, out DynamicBuffer<TraitBufferComponent<float>> floatBuffer);
+
+                if (success)
+                {
+                    for (int j = 0; j < floatBuffer.Length; j++)
+                    {
+                        if (floatBuffer[j].traitType == TraitType.speed)
+                        {
+                            floatBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextFloat(math.min(floatBuffer[j].minValue * 2, floatBuffer[j].maxValue), floatBuffer[j].maxValue);
+                        }
+                    }
+                }
+
+
+
                 //Create the entity creation command
                 Entity e = ecb.Instantiate(sortKey, spawnPoint.ValueRO.prefab);
+
 
 
                 //int defaultSize = 10;// +epoch*5;
 
                 //Set the transform
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = transformRef.ValueRO.Value.Scale};
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = 1};
                 ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
             
                 //Set the boundary and target position 
                 float4 boundary = new float4(transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z, transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z) + spawnPoint.ValueRO.boundary;
                 ecb.SetComponent<TargetPositionComponent>(sortKey, e, new TargetPositionComponent { value = pos, boundary = boundary });
-            
-            
+
+
+
+
             }
 
             //Loop through all the ones to keep
@@ -98,6 +132,7 @@ public readonly partial struct SpawnAspect : IAspect
                 //Set health and energy components back to max
                 ecb2.SetComponent<HealthComponent>(index, e, new HealthComponent { value = toKeepMaxHealth[index].ValueRO.value });
                 ecb2.SetComponent<EnergyComponent>(index, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
+                ecb2.SetComponent<FoodConsumedComponent>(index, e, new FoodConsumedComponent{ value = 0 });
 
                 //Set the boundary and target position 
                 float4 boundary = new float4(transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z, transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z) + spawnPoint.ValueRO.boundary;

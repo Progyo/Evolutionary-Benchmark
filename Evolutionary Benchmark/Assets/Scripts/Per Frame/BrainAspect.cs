@@ -108,7 +108,7 @@ public struct BrainTest :  IBrain
             }
         }
 
-        float cost = speed * size / 10f;
+        float cost = (speed * size) / 10f;
 
         //Action cost
         if (_energy.ValueRO.value > 0)

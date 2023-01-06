@@ -23,7 +23,7 @@ public struct EvaluationFunction : IEvaluate
     private RefRW<MaxHealthComponent> _maxHealth;
     private BufferLookup<TraitBufferComponent<int>> _intLookup;
     private BufferLookup<TraitBufferComponent<float>> _floatLookup;
-
+    private RefRW<FoodConsumedComponent> _foodEaten;
 
     public RefRW<Entity> entity { get { return _entity; } set { _entity = value; } }
     public RefRW<LocalToWorldTransform> transform { get { return _transform; } set { _transform = value; } }
@@ -38,6 +38,8 @@ public struct EvaluationFunction : IEvaluate
     public BufferLookup<TraitBufferComponent<int>> intLookup { get { return _intLookup; } set { _intLookup = value; } }
     public BufferLookup<TraitBufferComponent<float>> floatLookup { get { return _floatLookup; } set { _floatLookup = value; } }
 
+    public RefRW<FoodConsumedComponent> foodEaten { get { return _foodEaten; } set { _foodEaten = value; } }
+
     [BurstCompile]
     public float Evaluate()
     {
@@ -45,7 +47,8 @@ public struct EvaluationFunction : IEvaluate
         var energy = math.max(_energy.ValueRO.value,0f);
         var maxHealth = _maxHealth.ValueRO.value;
         var maxEnergy = _maxEnergy.ValueRO.value;
+        var food = foodEaten.ValueRO.value;
 
-        return (health*health+energy)/(maxHealth*maxHealth + maxEnergy);
+        return (health*health+energy)/(maxHealth*maxHealth + maxEnergy) + food*food/50f;
     }
 }

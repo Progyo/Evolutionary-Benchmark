@@ -56,11 +56,13 @@ public readonly partial struct MoveAspect : IAspect
 
         }
 
-        float3 dir = math.normalize(targetPosition.ValueRO.value - transformAspect.Position);
+        float3 dir = targetPosition.ValueRO.value - transformAspect.Position;
+        float3 dirNormal = math.normalize(dir);
 
-        if(math.lengthsq(dir) > 0.05f) 
+
+        if (math.lengthsq(dir) > 0.05f) 
         {
-            transformAspect.Position += dir * deltaTime * speed / size;
+            transformAspect.Position += dirNormal * deltaTime * speed / size;
             
         }
 

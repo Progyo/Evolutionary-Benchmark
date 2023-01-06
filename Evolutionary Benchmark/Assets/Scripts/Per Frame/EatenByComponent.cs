@@ -23,6 +23,7 @@ public struct EatenByComponent : IComponentData
     public RefStruct<MaxHealthComponent> maxHealth;
     public RefStruct<EnergyComponent> energy;
     public RefStruct<MaxEnergyComponent> maxEnergy;
+    public RefStruct<FoodConsumedComponent> foodConsumed;
 }
 
 //[GenerateTestsForBurstCompatibility(RequiredUnityDefine = "ENABLE_UNITY_COLLECTIONS_CHECKS", GenericTypeArguments = new Type[] { typeof(BurstCompatibleComponentData) })]

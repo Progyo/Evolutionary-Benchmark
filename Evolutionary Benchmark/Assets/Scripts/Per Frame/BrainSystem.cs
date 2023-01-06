@@ -38,6 +38,7 @@ public partial struct BrainSystem : ISystem
     ComponentTypeHandle<HealthComponent> _healthTypeHandle;
     ComponentTypeHandle<MaxEnergyComponent> _maxEnergyTypeHandle;
     ComponentTypeHandle<MaxHealthComponent> _maxHealthTypeHandle;
+    ComponentTypeHandle<FoodConsumedComponent> _foodConsumedTypeHandle;
     EntityTypeHandle _entityTypeHandle;
 
     [BurstCompile]
@@ -59,7 +60,8 @@ public partial struct BrainSystem : ISystem
          .AddAdditionalQuery().
          WithAllRW<MaxDecisionSpeedComponent, DecisionSpeedComponent>()
          .AddAdditionalQuery()
-         .WithAllRW<EnergyComponent, HealthComponent>();
+         .WithAllRW<EnergyComponent, HealthComponent>().AddAdditionalQuery()
+         .WithAll<FoodConsumedComponent>();
 
         _brainQuery = state.GetEntityQuery(builder  )
         ;
@@ -78,6 +80,7 @@ public partial struct BrainSystem : ISystem
         _healthTypeHandle = state.GetComponentTypeHandle<HealthComponent>();
         _maxEnergyTypeHandle = state.GetComponentTypeHandle<MaxEnergyComponent>();
         _maxHealthTypeHandle = state.GetComponentTypeHandle<MaxHealthComponent>();
+        _foodConsumedTypeHandle = state.GetComponentTypeHandle<FoodConsumedComponent>();
         _entityTypeHandle = state.GetEntityTypeHandle();
 
 
@@ -115,6 +118,7 @@ public partial struct BrainSystem : ISystem
             _healthTypeHandle.Update(ref state);
             _maxEnergyTypeHandle.Update(ref state);
             _maxHealthTypeHandle.Update(ref state);
+            _foodConsumedTypeHandle.Update(ref state);
             _entityTypeHandle.Update(ref state);
 
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -138,6 +142,7 @@ public partial struct BrainSystem : ISystem
                 maxHealthTypeHandle = _maxHealthTypeHandle,
                 intLookup = _intLookup,
                 floatLookup = _floatLookup,
+                foodConsumedTypeHandle = _foodConsumedTypeHandle,
                 ecb = ecbParallel
             }.ScheduleParallel(_brainQuery, state.Dependency);
             handle.Complete();
@@ -178,6 +183,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
     public ComponentTypeHandle<HealthComponent> healthTypeHandle;
     public ComponentTypeHandle<MaxEnergyComponent> maxEnergyTypeHandle;
     public ComponentTypeHandle<MaxHealthComponent> maxHealthTypeHandle;
+    public ComponentTypeHandle<FoodConsumedComponent> foodConsumedTypeHandle;
     public EntityTypeHandle entityTypeHandle;
 
     public EntityCommandBuffer.ParallelWriter ecb;
@@ -202,6 +208,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
         var chunkHealth = chunk.GetNativeArray(healthTypeHandle);
         var chunkMaxEnergy = chunk.GetNativeArray(maxEnergyTypeHandle);
         var chunkMaxHealth = chunk.GetNativeArray(maxHealthTypeHandle);
+        var chunkConsumedCount = chunk.GetNativeArray(foodConsumedTypeHandle);
 
         //var chunkEntityPtr = chunk.GetEntityDataPtrRO(entityTypeHandle);
         //chunk.GetNativeArray
@@ -262,11 +269,12 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
                     var tempHealth = new RefStruct<HealthComponent>(chunkHealth, i);
                     var tempMaxEnergy = new RefStruct<MaxEnergyComponent>(chunkMaxEnergy, i);
                     var tempMaxHealth = new RefStruct<MaxHealthComponent>(chunkMaxHealth, i);
+                    var tempFoodConsumed = new RefStruct<FoodConsumedComponent>(chunkConsumedCount, i);
 
                     ecb.AddComponent<EatenByComponent>(i, entityToConsume, new EatenByComponent { eatenBy = tempEntity,
                         /*nurishment = 10f,*/ energy =tempEnergy,
                         health= tempHealth, maxEnergy = tempMaxEnergy,
-                        maxHealth = tempMaxHealth});
+                        maxHealth = tempMaxHealth, foodConsumed = tempFoodConsumed});
                 }
                 else if (action == BrainAction.attack) 
                 {
@@ -289,6 +297,7 @@ public unsafe struct BrainJob<T> : IJobChunk where T : struct, IBrain
         chunkHealth.Dispose();
         chunkMaxEnergy.Dispose();
         chunkMaxHealth.Dispose();
+        chunkConsumedCount.Dispose();
     }
 }
 
