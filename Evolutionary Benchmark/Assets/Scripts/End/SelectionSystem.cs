@@ -35,8 +35,6 @@ public partial class SelectionSystem : SystemBase
 
             
             float totalFitness = 0f;
-            
-
 
             //Sort fitness
             Dictionary<Entity, float> fitnessValues = new Dictionary<Entity, float>();
@@ -98,21 +96,9 @@ public partial class SelectionSystem : SystemBase
                     keepEntity++;
                     totalOffspring++;
                 }
-                //offSpring.Add(keepEntity);
-                //offSpring[i] = keepEntity;
-                //EntityManager.AddComponentData<KeepComponent>(population[i].Key, new KeepComponent { offspring = keepEntity });
-                //EntityManager.SetComponentData<KeepComponent>(population[i].Key, new KeepComponent { offspring = keepEntity });
-                //ecb.AddComponent<KeepComponent>(population[i].Key, new KeepComponent { offspring = keepEntity });
+
                 ecb.AddComponent<KeepComponent>(population[i].Key, new KeepComponent { offspring = keepEntity });
             }
-            /*EntityCommandBuffer ecb2 = GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(World.Unmanaged);
-            for (int i = 0; i < offSpring.Length; i++)
-            {
-                ecb2.SetComponent<KeepComponent>(population[i].Key, new KeepComponent { offspring = offSpring[i] });
-                
-            }*/
-
-            
 
 
             ecb.Playback(World.Unmanaged.EntityManager);
@@ -120,17 +106,7 @@ public partial class SelectionSystem : SystemBase
 
             offSpring.Dispose();
 
-            //UnityEngine.Debug.Log(totalOffspring);
-            
-            /*for (int i = 0; i < toKeep; i++)
-            {
-                pointers[i] = start + i * dist;
-            }
 
-            //RWS
-            NativeArray<Population> populationStruct = new NativeArray<Population>(population.Count, Allocator.TempJob);
-            
-            EntityCommandBuffer.ParallelWriter ecbParallel = ecb.AsParallelWriter();*/
 
             //Metric stuff
             _intBufferLookup.Update(this);
@@ -145,10 +121,9 @@ public partial class SelectionSystem : SystemBase
             //Convert to native array and log some metrics
             for (int i = 0; i < population.Count; i++)
             {
-                //populationStruct[i] = new Population { entity = population[i].Key, fitness = population[i].Value };
-
-
                 //Size Metric
+
+                EntityMetric entityMetric = new EntityMetric { };
 
                 bool successBuffer = _intBufferLookup.TryGetBuffer(population[i].Key, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
                 if (successBuffer) 
@@ -159,6 +134,8 @@ public partial class SelectionSystem : SystemBase
                         {
                             sizeMetric.totalSize += intBuffer[j].value;
                             sizeMetric.totalCount++;
+
+                            entityMetric.size = intBuffer[j].value;
 
                             if (i == 0) 
                             {
@@ -185,6 +162,8 @@ public partial class SelectionSystem : SystemBase
                             speedMetric.totalSpeed += floatBuffer[j].value;
                             speedMetric.totalCount++;
 
+                            entityMetric.speed = floatBuffer[j].value;
+
                             if (i == 0)
                             {
                                 speedMetric.topSpeed = floatBuffer[j].value;
@@ -198,6 +177,13 @@ public partial class SelectionSystem : SystemBase
                     }
                 }
 
+
+                //Other metrics
+
+                entityMetric.health = GetComponent<HealthComponent>(population[i].Key).value;
+                entityMetric.energy = GetComponent<EnergyComponent>(population[i].Key).value;
+
+                LoggerSystem.Logger.LogEntityEpoch(simState.currentEpoch, entityMetric);
             }
 
             /*JobHandle handle = new RWSJob { pointers = pointers, population = populationStruct, ecb = ecbParallel }.Schedule(pointers.Length, pointers.Length / 100, Dependency);

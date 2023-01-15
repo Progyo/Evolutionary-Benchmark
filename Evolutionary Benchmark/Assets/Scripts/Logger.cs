@@ -102,7 +102,7 @@ public partial class LoggerSystem : SystemBase
                     //Logger.LogEpoch(simState.ValueRO.currentEpoch, fitnessMetric);
                 }
                 //Debug.Log(mutations);
-                Debug.Log(Logger.SaveJson());
+                //Debug.Log(Logger.SaveJson());
 
                 //json += string.Format("Time: {0} Epoch: {1} Average Fitness: {2} Max Fitness: {3}", simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, averageFitness, highestFitness) + "\n";
 
@@ -139,6 +139,8 @@ public partial class LoggerSystem : SystemBase
     public static class Logger
     {
         //Internally the time -1 is used for all other metrics that are on the same level in the heirarchy as time
+        //Internally the time -2 is used for all entity metrics that are on the same level in the heirarchy as time
+
 
         /// <summary>
         /// Epoch: {Time: {json}, "Other Metrics": }
@@ -170,6 +172,11 @@ public partial class LoggerSystem : SystemBase
             LogTimeAndEpoch(-1f, epoch, metric);
         }
 
+        public static void LogEntityEpoch(int epoch, IMetric metric)
+        {
+            LogTimeAndEpoch(-2f, epoch, metric);
+        }
+
         public static string SaveJson()
         {
             string json = "{\n";
@@ -178,6 +185,12 @@ public partial class LoggerSystem : SystemBase
 
             foreach(KeyValuePair<int,Dictionary<float,List<string>>> pair in cache) 
             {
+                //Skip initial
+                if(pair.Key == 0) 
+                {
+                    continue;
+                }
+
                 json += "\""+ pair.Key + "\": {\n";
 
                 int insideCount = 0;
@@ -186,7 +199,7 @@ public partial class LoggerSystem : SystemBase
                     foreach (string str in pair.Value[-1f])
                     {
                         insideCount++;
-                        if (insideCount < pair.Value[-1f].Count)
+                        if (insideCount < pair.Value[-1f].Count || pair.Value.ContainsKey(-2f))
                         {
                             json += str + ",\n";
                         }
@@ -197,11 +210,33 @@ public partial class LoggerSystem : SystemBase
                         
                     }
                 }
+                insideCount = 0;
+                if (pair.Value.ContainsKey(-2f))
+                {
+                    
+                    json += "\"epoch\": [";
+                    foreach (string str in pair.Value[-2f])
+                    {
+                        
+                        insideCount++;
+                        if (insideCount < pair.Value[-2f].Count)
+                        {
+                            json += str + ",\n";
+                        }
+                        else
+                        {
+                            json += str + "\n";
+                        }
+
+                    }
+                    //This might need to be changed to have a ], in some cases
+                    json += "]";
+                }
 
                 insideCount = 0;
                 foreach (KeyValuePair<float,List<string>> pair2 in pair.Value) 
                 {
-                    if(pair2.Key != -1f) 
+                    if(pair2.Key != -1f && pair2.Key != -2f) 
                     {
                         json += pair2.Key + ": [\n";
 

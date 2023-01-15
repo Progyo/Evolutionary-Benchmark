@@ -9005,7 +9005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d4cdb9b8e0c684ba623917d3257064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  phase: 0
+  phase: 3
   timeElapsed: 0
   epochDuration: 30
   currentEpoch: 0
@@ -12855,7 +12855,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1848202911
 Transform:
   m_ObjectHideFlags: 0
