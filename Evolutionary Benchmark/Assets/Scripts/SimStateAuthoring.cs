@@ -43,6 +43,8 @@ public class SimStateAuthoring : MonoBehaviour
     public GameObject prefab;
 
 
+    public GameObject fieldPrefab;
+
     /// <summary>
     /// The number of fields where entities can spawn on (Also the number of spawners)
     /// </summary>
@@ -68,7 +70,8 @@ public class SimStateBaker : Baker<SimStateAuthoring>
             entityPrefab = GetEntity(authoring.prefab),
             fields = authoring.fields,
             survivePercent = authoring.survivePercent,
-            killedThisGen = authoring.maxEntities
+            killedThisGen = authoring.maxEntities,
+            fieldEntityPrefab = GetEntity(authoring.fieldPrefab)
         });
 
         AddComponent(new RandomComponent { value = new Unity.Mathematics.Random(authoring.seed) });

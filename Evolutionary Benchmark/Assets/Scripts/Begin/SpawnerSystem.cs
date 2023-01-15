@@ -6,6 +6,8 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
+using static Unity.VisualScripting.Metadata;
+using static UnityEngine.EventSystems.EventTrigger;
 
 
 /// <summary>
@@ -143,6 +145,153 @@ public partial class SpawnerSystem : SystemBase//ISystem
             //Reset killed stats because they have been spawned new
             state = SystemAPI.GetSingletonRW<SimStateComponent>();
             state.ValueRW.killedThisGen = 0;
+
+        }
+        else if (simState.phase == Phase.initialize) 
+        {
+
+            int width = 8;
+            int height = 8;
+            float spacing = 75f;
+
+            BufferLookup<Child> lookup = GetBufferLookup<Child>();
+
+            bool foundField = false;
+
+            Entities.WithAll<FieldComponent>().ForEach((Entity entity, in FieldComponent field) =>
+            {
+                bool success = lookup.TryGetBuffer(entity, out DynamicBuffer<Child> buffer);
+
+                if(success && buffer.Length > 0) 
+                {
+                    for (int i = 0; i < buffer.Length; i++)
+                    {
+                        if (HasComponent<SpawnPointComponent>(buffer[i].Value))
+                        {
+                            SpawnPointComponent spawn = GetComponent<SpawnPointComponent>(buffer[i].Value);
+
+                            SetComponent<SpawnPointComponent>(buffer[i].Value, new SpawnPointComponent
+                            {
+                                boundary = spawn.boundary,
+                                id = field.value,
+                                prefab = spawn.prefab,
+                                radius = spawn.radius,
+                                random = spawn.random,
+                                strategy = spawn.strategy,
+                                type = spawn.type,
+                            });
+                        }
+                        else if (HasComponent<FoodSpawnPointComponent>(buffer[i].Value))
+                        {
+                            FoodSpawnPointComponent spawn = GetComponent<FoodSpawnPointComponent>(buffer[i].Value);
+
+                            SetComponent<FoodSpawnPointComponent>(buffer[i].Value, new FoodSpawnPointComponent
+                            {
+                                boundary = spawn.boundary,
+                                id = field.value,
+                                prefab = spawn.prefab,
+                                radius = spawn.radius,
+                                random = spawn.random,
+                                strategy = spawn.strategy,
+                                type = spawn.type,
+                            });
+                        }
+                    }
+
+                    foundField = true;
+                }
+                
+
+            }).Run();
+
+
+            if (foundField) 
+            {
+                RefRW<SimStateComponent> state = SystemAPI.GetSingletonRW<SimStateComponent>();
+                state.ValueRW.fields = width * height;
+                state.ValueRW.phase = Phase.end;
+                return;
+            }
+
+            //Spawn all the fields
+
+
+
+
+            for (int x = 1; x < width+1; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    
+
+                    Entity e = EntityManager.Instantiate(simState.fieldEntityPrefab);
+                    
+                    //LocalToWorld t = GetComponent<LocalToWorld>(e);
+
+                    LocalToWorldTransform t = GetComponent<LocalToWorldTransform>(e);
+
+                    float3 pos = new float3((x-1-width/2f) ,0f, (y - height/ 2f)) * spacing;
+
+                    //float4x4 val = float4x4.TRS(pos, t.Rotation, 1f);
+
+                    //SetComponent<LocalToWorld>(e, new LocalToWorld { Value = val});
+                    UniformScaleTransform val = new UniformScaleTransform { Position = pos, Rotation = t.Value.Rotation, Scale = t.Value.Scale };
+                    EntityManager.SetComponentData<LocalToWorldTransform>(e, new LocalToWorldTransform { Value = val});
+
+                    int fieldId = y * width + x;
+
+                    EntityManager.AddComponentData<FieldComponent>(e, new FieldComponent {value=  fieldId});
+
+                    /*
+                    int fieldId = y * width + x;
+                    BufferLookup<Child> lookup = GetBufferLookup<Child>();
+
+
+
+                    bool success2 = lookup.TryGetBuffer(e, out DynamicBuffer<Child> buffer);
+
+                    if (success2 && buffer.Length > 0)
+                    {
+                        for (int i = 0; i < buffer.Length; i++)
+                        {
+                            if (HasComponent<SpawnPointComponent>(buffer[i].Value)) 
+                            {
+                                SpawnPointComponent spawn = GetComponent<SpawnPointComponent>(buffer[i].Value);
+
+                                SetComponent<SpawnPointComponent>(buffer[i].Value, new SpawnPointComponent
+                                {
+                                    boundary = spawn.boundary,
+                                    id = fieldId,
+                                    prefab = spawn.prefab,
+                                    radius = spawn.radius,
+                                    random = spawn.random,
+                                    strategy = spawn.strategy,
+                                    type = spawn.type,
+                                });
+                            }
+                            else if (HasComponent<FoodSpawnPointComponent>(buffer[i].Value)) 
+                            {
+                                FoodSpawnPointComponent spawn = GetComponent<FoodSpawnPointComponent>(buffer[i].Value);
+
+                                SetComponent<FoodSpawnPointComponent>(buffer[i].Value, new FoodSpawnPointComponent
+                                {
+                                    boundary = spawn.boundary,
+                                    id = fieldId,
+                                    prefab = spawn.prefab,
+                                    radius = spawn.radius,
+                                    random = spawn.random,
+                                    strategy = spawn.strategy,
+                                    type = spawn.type,
+                                });
+                            }
+                        }
+                    }*/
+
+                }
+            }
+
+
+
 
         }
     }

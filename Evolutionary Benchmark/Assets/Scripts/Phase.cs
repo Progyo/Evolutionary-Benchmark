@@ -6,6 +6,11 @@
 public enum Phase 
 {
     /// <summary>
+    /// Phase that is only active once and creates all the fields.
+    /// </summary>
+    initialize,
+
+    /// <summary>
     /// The beginning of an epoch (Spawn entities etc)
     /// </summary>
     start,

@@ -37,6 +37,12 @@ public struct SimStateComponent : IComponentData
     /// </summary>
     public Entity entityPrefab;
 
+
+    /// <summary>
+    /// The field entity prefab
+    /// </summary>
+    public Entity fieldEntityPrefab;
+
     /// <summary>
     /// The number of fields where entities can spawn on (Also the number of spawners)
     /// </summary>

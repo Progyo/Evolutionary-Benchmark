@@ -120,7 +120,7 @@ public partial class SelectionSystem : SystemBase
 
             offSpring.Dispose();
 
-            UnityEngine.Debug.Log(totalOffspring);
+            //UnityEngine.Debug.Log(totalOffspring);
             
             /*for (int i = 0; i < toKeep; i++)
             {

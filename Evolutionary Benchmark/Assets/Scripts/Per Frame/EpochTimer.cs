@@ -36,7 +36,7 @@ public partial class EpochTimer : SystemBase
 
 
         //Start phase
-        if ((state.ValueRO.timeElapsed == 0f || state.ValueRO.phase == Phase.evaluated) && (state.ValueRO.phase != Phase.stop && state.ValueRO.phase != Phase.end && state.ValueRO.phase != Phase.start))
+        if ((state.ValueRO.timeElapsed == 0f || state.ValueRO.phase == Phase.evaluated) && (state.ValueRO.phase != Phase.stop && state.ValueRO.phase != Phase.end && state.ValueRO.phase != Phase.start && state.ValueRO.phase != Phase.initialize))
         {
             state.ValueRW.phase = Phase.start;
             state.ValueRW.currentEpoch++;
