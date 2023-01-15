@@ -101,7 +101,7 @@ public partial class LoggerSystem : SystemBase
                     //Logger.LogTimeAndEpoch(simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, fitnessMetric);
                     //Logger.LogEpoch(simState.ValueRO.currentEpoch, fitnessMetric);
                 }
-                Debug.Log(mutations);
+                //Debug.Log(mutations);
                 Debug.Log(Logger.SaveJson());
 
                 //json += string.Format("Time: {0} Epoch: {1} Average Fitness: {2} Max Fitness: {3}", simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, averageFitness, highestFitness) + "\n";

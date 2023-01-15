@@ -49,7 +49,7 @@ public partial class DestroyerSystem : SystemBase
 
             if(simState.ValueRO.phase == Phase.running) 
             {
-                Entities.WithAll<HealthComponent>().WithNone<DestroyComponent>().ForEach((Entity entity, HealthComponent health) =>
+                Entities.WithAll<HealthComponent>().WithNone<DestroyComponent>().ForEach((Entity entity, in HealthComponent health) =>
                 {
                     if (health.value <= 0f)
                     {

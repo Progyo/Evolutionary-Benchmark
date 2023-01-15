@@ -136,12 +136,12 @@ public readonly partial struct SpawnAspect : IAspect
 
                 //Set the transform
                 UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = transformRef.ValueRO.Value.Scale };
-                ecb.SetComponent<LocalToWorldTransform>(index, e, new LocalToWorldTransform { Value = transform });
+                ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
 
                 //Set health and energy components back to max
-                ecb2.SetComponent<HealthComponent>(index, e, new HealthComponent { value = toKeepMaxHealth[index].ValueRO.value });
-                ecb2.SetComponent<EnergyComponent>(index, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
-                ecb2.SetComponent<FoodConsumedComponent>(index, e, new FoodConsumedComponent{ value = 0 });
+                ecb2.SetComponent<HealthComponent>(sortKey, e, new HealthComponent { value = toKeepMaxHealth[index].ValueRO.value });
+                ecb2.SetComponent<EnergyComponent>(sortKey, e, new EnergyComponent { value = toKeepMaxEnergy[index].ValueRO.value });
+                ecb2.SetComponent<FoodConsumedComponent>(sortKey, e, new FoodConsumedComponent{ value = 0 });
 
                 //Set the boundary and target position 
                 float4 boundary = new float4(transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z, transformRef.ValueRO.Value.Position.x, transformRef.ValueRO.Value.Position.z) + spawnPoint.ValueRO.boundary;

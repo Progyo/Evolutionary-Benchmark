@@ -10,7 +10,7 @@ using UnityEngine;
 public struct TestCombinationAlgorithm : ICombinationAlgorithn
 {
     [BurstCompile]
-    public void SelectAndCreate(RefRW<RandomComponent> random, NativeArray<Entity> entities, NativeArray<FitnessComponent> fitness, int index, EntityCommandBuffer.ParallelWriter ecb)
+    public void SelectAndCreate(RefRW<RandomComponent> random, NativeArray<Entity> entities, NativeArray<FitnessComponent> fitness, NativeArray<KeepComponent> toKeep, int index, EntityCommandBuffer.ParallelWriter ecb)
     {
         int entity1Index = index * 2;
         int entity2Index = index * 2 + 1;
@@ -27,9 +27,12 @@ public struct TestCombinationAlgorithm : ICombinationAlgorithn
             sortKey = entity1Index;
         }
 
+        for (int i = 0; i < toKeep[entity1Index].offspring + toKeep[entity2Index].offspring; i++)
+        {
+            Entity e = ecb.Instantiate(sortKey + i * (toKeep.Length+1), toCreate);
 
-        Entity e = ecb.Instantiate(sortKey, toCreate);
+            ecb.AddComponent<KeepComponent>(sortKey + i * (toKeep.Length + 1) + 1, e);
+        }
 
-        ecb.AddComponent<KeepComponent>(sortKey, e);
     }
 }

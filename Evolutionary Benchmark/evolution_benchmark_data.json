@@ -6,17 +6,122 @@
 "selected" : 0
 },
 "1": {
-"fitness" : {"average": 0.2183645, "max": 0.7392679},
-"killed" : 44,
+"fitness" : {"average": 0.2206781, "max": 0.6256109},
+"killed" : 56,
 "size" : {"average": 10, "top": 10, "worst": 10},
 "speed" : {"average": 3.451171, "top": 3.451159, "worst": 3.451159},
-"selected" : 2006
+"selected" : 2048
 },
 "2": {
-"fitness" : {"average": 0.2044079, "max": 0.9988092},
-"killed" : 111,
-"size" : {"average": 9.975658, "top": 5, "worst": 12},
-"speed" : {"average": 3.439774, "top": 0.9574485, "worst": 3.451159},
-"selected" : 1953
+"fitness" : {"average": 0.2077278, "max": 0.9971419},
+"killed" : 144,
+"size" : {"average": 9.963834, "top": 10, "worst": 13},
+"speed" : {"average": 3.428222, "top": 0.9574485, "worst": 3.451159},
+"selected" : 2048
+},
+"3": {
+"fitness" : {"average": 0.2900994, "max": 1.233731},
+"killed" : 107,
+"size" : {"average": 9.719729, "top": 5, "worst": 10},
+"speed" : {"average": 3.236177, "top": 3.451159, "worst": 4.985005},
+"selected" : 2048
+},
+"4": {
+"fitness" : {"average": 0.4507439, "max": 1.233731},
+"killed" : 73,
+"size" : {"average": 9.352473, "top": 3, "worst": 13},
+"speed" : {"average": 2.574502, "top": 2.253693, "worst": 3.451159},
+"selected" : 2048
+},
+"5": {
+"fitness" : {"average": 0.5959467, "max": 1.232846},
+"killed" : 9,
+"size" : {"average": 9.33888, "top": 3, "worst": 10},
+"speed" : {"average": 1.743469, "top": 7.416916, "worst": 4.911044},
+"selected" : 2048
+},
+"6": {
+"fitness" : {"average": 0.7132439, "max": 1.233731},
+"killed" : 0,
+"size" : {"average": 9.501953, "top": 7, "worst": 10},
+"speed" : {"average": 1.071586, "top": 3.451159, "worst": 4.618618},
+"selected" : 2048
+},
+"7": {
+"fitness" : {"average": 0.8316991, "max": 0.9999313},
+"killed" : 2,
+"size" : {"average": 9.520029, "top": 3, "worst": 13},
+"speed" : {"average": 0.4938512, "top": 0.1, "worst": 2.907531},
+"selected" : 2048
+},
+"8": {
+"fitness" : {"average": 0.9379163, "max": 0.9999313},
+"killed" : 0,
+"size" : {"average": 9.212158, "top": 3, "worst": 14},
+"speed" : {"average": 0.1510534, "top": 0.1, "worst": 2.148836},
+"selected" : 2048
+},
+"9": {
+"fitness" : {"average": 0.9359383, "max": 0.9999343},
+"killed" : 0,
+"size" : {"average": 8.205811, "top": 3, "worst": 10},
+"speed" : {"average": 0.1422099, "top": 0.1, "worst": 2.540398},
+"selected" : 2048
+},
+"10": {
+"fitness" : {"average": 0.9312115, "max": 0.9999313},
+"killed" : 0,
+"size" : {"average": 6.716553, "top": 3, "worst": 10},
+"speed" : {"average": 0.1420743, "top": 0.1, "worst": 2.450929},
+"selected" : 2048
+},
+"11": {
+"fitness" : {"average": 0.9338818, "max": 0.9999373},
+"killed" : 0,
+"size" : {"average": 5.293213, "top": 3, "worst": 10},
+"speed" : {"average": 0.1502901, "top": 0.1, "worst": 2.4454},
+"selected" : 2048
+},
+"12": {
+"fitness" : {"average": 0.9171777, "max": 0.9999403},
+"killed" : 0,
+"size" : {"average": 4.447754, "top": 3, "worst": 6},
+"speed" : {"average": 0.1387523, "top": 0.1, "worst": 2.593091},
+"selected" : 2048
+},
+"13": {
+"fitness" : {"average": 0.91799, "max": 0.9999373},
+"killed" : 0,
+"size" : {"average": 3.83374, "top": 3, "worst": 8},
+"speed" : {"average": 0.1453504, "top": 0.1, "worst": 1.65114},
+"selected" : 2048
+},
+"14": {
+"fitness" : {"average": 0.8898786, "max": 0.9999373},
+"killed" : 0,
+"size" : {"average": 3.156006, "top": 3, "worst": 7},
+"speed" : {"average": 0.1391854, "top": 0.1, "worst": 2.513604},
+"selected" : 2048
+},
+"15": {
+"fitness" : {"average": 0.8935497, "max": 0.9999403},
+"killed" : 0,
+"size" : {"average": 3.092285, "top": 3, "worst": 7},
+"speed" : {"average": 0.1426199, "top": 0.1, "worst": 0.9366208},
+"selected" : 2048
+},
+"16": {
+"fitness" : {"average": 0.8901411, "max": 0.9999373},
+"killed" : 0,
+"size" : {"average": 3.060791, "top": 3, "worst": 3},
+"speed" : {"average": 0.132491, "top": 0.1, "worst": 1.66245},
+"selected" : 2048
+},
+"17": {
+"fitness" : {"average": 0.8992122, "max": 0.9999343},
+"killed" : 0,
+"size" : {"average": 3.080811, "top": 3, "worst": 3},
+"speed" : {"average": 0.1493084, "top": 0.1, "worst": 2.563346},
+"selected" : 2048
 }
 }

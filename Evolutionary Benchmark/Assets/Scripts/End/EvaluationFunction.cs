@@ -49,6 +49,6 @@ public struct EvaluationFunction : IEvaluate
         var maxEnergy = _maxEnergy.ValueRO.value;
         var food = foodEaten.ValueRO.value;
 
-        return (health*health+energy)/(maxHealth*maxHealth + maxEnergy) + food*food/50f;
+        return (health*health+energy)/(maxHealth*maxHealth + maxEnergy) + food*food/25f;
     }
 }
