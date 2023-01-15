@@ -1,6 +1,6 @@
 import json
 
-filePath= "../Data/run7-pop_4096_health_100_energy_50_foodCount_best_init_progressive.json"
+filePath= "../Data/run1-pop_4096_health_100_energy_50_foodCount_best_init_progressive.json"
 
 
 #Import and prepare data
