@@ -103,7 +103,7 @@ public partial class LoggerSystem : SystemBase
                 }
                 //Debug.Log(mutations);
                 //Debug.Log(Logger.SaveJson());
-
+                Logger.SaveJsonIncrement();
                 //json += string.Format("Time: {0} Epoch: {1} Average Fitness: {2} Max Fitness: {3}", simState.ValueRO.timeElapsed, simState.ValueRO.currentEpoch, averageFitness, highestFitness) + "\n";
 
                 //Debug.Log(json);
@@ -147,6 +147,11 @@ public partial class LoggerSystem : SystemBase
         /// </summary>
         private static Dictionary<int, Dictionary<float, List<string>>> cache = new Dictionary<int, Dictionary<float, List<string>>>();
 
+        /// <summary>
+        /// The last epoch that was saved
+        /// </summary>
+        private static int lastEpoch = 0;
+
         public static void LogOnce(IMetric metric)
         {
             
@@ -177,24 +182,26 @@ public partial class LoggerSystem : SystemBase
             LogTimeAndEpoch(-2f, epoch, metric);
         }
 
-        public static string SaveJson()
+
+        private static string SaveJson() 
         {
-            string json = "{\n";
+
+            string json = "";
 
             int outsideCount = 0;
 
-            foreach(KeyValuePair<int,Dictionary<float,List<string>>> pair in cache) 
+            foreach (KeyValuePair<int, Dictionary<float, List<string>>> pair in cache)
             {
                 //Skip initial
-                if(pair.Key == 0) 
+                if (pair.Key <= lastEpoch)
                 {
                     continue;
                 }
 
-                json += "\""+ pair.Key + "\": {\n";
+                json += "\"" + pair.Key + "\": {\n";
 
                 int insideCount = 0;
-                if (pair.Value.ContainsKey(-1f)) 
+                if (pair.Value.ContainsKey(-1f))
                 {
                     foreach (string str in pair.Value[-1f])
                     {
@@ -207,17 +214,17 @@ public partial class LoggerSystem : SystemBase
                         {
                             json += str + "\n";
                         }
-                        
+
                     }
                 }
                 insideCount = 0;
                 if (pair.Value.ContainsKey(-2f))
                 {
-                    
+
                     json += "\"epoch\": [";
                     foreach (string str in pair.Value[-2f])
                     {
-                        
+
                         insideCount++;
                         if (insideCount < pair.Value[-2f].Count)
                         {
@@ -229,14 +236,15 @@ public partial class LoggerSystem : SystemBase
                         }
 
                     }
+
                     //This might need to be changed to have a ], in some cases
                     json += "]";
                 }
 
                 insideCount = 0;
-                foreach (KeyValuePair<float,List<string>> pair2 in pair.Value) 
+                foreach (KeyValuePair<float, List<string>> pair2 in pair.Value)
                 {
-                    if(pair2.Key != -1f && pair2.Key != -2f) 
+                    if (pair2.Key != -1f && pair2.Key != -2f)
                     {
                         json += pair2.Key + ": [\n";
 
@@ -246,36 +254,71 @@ public partial class LoggerSystem : SystemBase
                         }
                         insideCount++;
 
-                        if(insideCount < pair.Value.Count) 
+                        if (insideCount < pair.Value.Count)
                         {
                             json += "],\n";
                         }
-                        else 
+                        else
                         {
                             json += "]\n";
                         }
-                        
+
                     }
 
                 }
                 outsideCount++;
 
-                if(outsideCount < cache.Count) 
+                if (outsideCount < cache.Count)
                 {
                     json += "},\n";
                 }
-                else 
+                else
                 {
                     json += "}\n";
                 }
+
+                lastEpoch = pair.Key;
+
             }
 
+            
+
+            //File.WriteAllText("evolution_benchmark_data.json", json);
+
+            return json;
+        }
+
+        public static string SaveJsonWhole()
+        {
+            string json = "{\n";
+
+            lastEpoch = 0;
+
+            json += SaveJson();
+
             json += "}\n";
+
 
             File.WriteAllText("evolution_benchmark_data.json", json);
 
             return json;
         }
+
+
+        public static void SaveJsonIncrement() 
+        {
+            string newJson = SaveJson();
+
+
+            if (!File.Exists("evolution_benchmark_data.json")) 
+            {
+                File.WriteAllText("evolution_benchmark_data.json", "{\n");
+            }
+
+            File.AppendAllText("evolution_benchmark_data.json", newJson);
+
+        }
+
     }
 
 

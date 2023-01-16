@@ -182,6 +182,7 @@ public partial class SelectionSystem : SystemBase
 
                 entityMetric.health = GetComponent<HealthComponent>(population[i].Key).value;
                 entityMetric.energy = GetComponent<EnergyComponent>(population[i].Key).value;
+                entityMetric.fitness = population[i].Value;
 
                 LoggerSystem.Logger.LogEntityEpoch(simState.currentEpoch, entityMetric);
             }

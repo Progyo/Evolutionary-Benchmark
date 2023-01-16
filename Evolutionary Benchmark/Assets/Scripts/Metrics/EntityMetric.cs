@@ -13,8 +13,10 @@ public struct EntityMetric : IMetric
 
     public float energy;
 
+    public float fitness;
+
     public string ToJsonString()
     {
-        return "{\"size\": " + size + ", \"speed\": " + speed + ", \"health\": " + health + ", \"energy\": "+ energy+ "}";
+        return "{\"size\": " + size + ", \"speed\": " + speed + ", \"health\": " + health + ", \"energy\": "+ energy+ ", \"fitness\": " + fitness+"}";
     }
 }
