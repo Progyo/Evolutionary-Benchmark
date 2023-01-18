@@ -59,4 +59,9 @@ public struct SimStateComponent : IComponentData
     /// </summary>
     public int killedThisGen;
 
+    /// <summary>
+    /// The mode of the simulation
+    /// </summary>
+    public SimulationMode mode;
+
 }

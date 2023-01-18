@@ -54,6 +54,11 @@ public class SimStateAuthoring : MonoBehaviour
     /// The maximum amount to keep alive for the next generation. Range between 0 and 1
     /// </summary>
     public float survivePercent;
+
+    /// <summary>
+    /// The mode of the simulation
+    /// </summary>
+    public SimulationMode mode;
 }
 
 
@@ -71,7 +76,8 @@ public class SimStateBaker : Baker<SimStateAuthoring>
             fields = authoring.fields,
             survivePercent = authoring.survivePercent,
             killedThisGen = authoring.maxEntities,
-            fieldEntityPrefab = GetEntity(authoring.fieldPrefab)
+            fieldEntityPrefab = GetEntity(authoring.fieldPrefab),
+            mode = authoring.mode,
         });
 
         AddComponent(new RandomComponent { value = new Unity.Mathematics.Random(authoring.seed) });

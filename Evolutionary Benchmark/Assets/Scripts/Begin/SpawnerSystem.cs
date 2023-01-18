@@ -121,7 +121,12 @@ public partial class SpawnerSystem : SystemBase//ISystem
             RefRW<SimStateComponent> state = SystemAPI.GetSingletonRW<SimStateComponent>();
             JobHandle handle = new SpawnJob { ecb = ecb,
                 spawnCount = toSpawnSpawnCount,
-                maxToSpawnCount = toSpawnCount,
+
+
+
+                ////PLEASE FIX THE * 2 later
+
+                maxToSpawnCount = toSpawnCount * 2,
                 toKeepSpawnCount = toKeepSpawnCount,
                 toKeep = toKeep,
                 toKeepMaxEnergy = toKeepMaxEnergy,
@@ -131,6 +136,7 @@ public partial class SpawnerSystem : SystemBase//ISystem
                 ecb2 = ecb2Parallel,
                 epoch = state.ValueRO.currentEpoch,
                 fittestEntity = fittest,
+                simMode = simState.mode,
             }.ScheduleParallel(Dependency);
 
 
@@ -340,10 +346,13 @@ public partial class SpawnerSystem : SystemBase//ISystem
         [ReadOnly]
         public int epoch;
 
+        [ReadOnly]
+        public SimulationMode simMode;
+
         [BurstCompile]
         public void Execute(SpawnAspect aspect, [EntityInQueryIndex] int sortKey) 
         {
-            aspect.SpawnEntity(ecb, ecb2, sortKey, spawnCount, maxToSpawnCount, toKeepSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup, epoch, fittestEntity);
+            aspect.SpawnEntity(ecb, ecb2, sortKey, spawnCount, maxToSpawnCount, toKeepSpawnCount, toKeep, toKeepMaxHealth, toKeepMaxEnergy, intBufferLookup, floatBufferLookup, epoch, fittestEntity, simMode);
         }
     }
 

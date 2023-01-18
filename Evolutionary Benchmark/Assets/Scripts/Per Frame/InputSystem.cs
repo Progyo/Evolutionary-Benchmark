@@ -49,7 +49,7 @@ public partial class InputSystem : SystemBase
             JobHandle handle = Dependency;
 
             //EntityQuery query = state.WorldUnmanaged.EntityManager.CreateEntityQuery(typeof(LocalToWorldTransform), typeof(EntityTypeComponent));
-            for (int i = 0; i < simState.fields; i++)
+            for (int i = 1; i <= simState.fields; i++)
             {
                 _SeeEntityQuery.SetSharedComponentFilter<FieldIdSharedComponent>(new FieldIdSharedComponent { value = i });
                 _SeeQuery.SetSharedComponentFilter<FieldIdSharedComponent>(new FieldIdSharedComponent { value = i });

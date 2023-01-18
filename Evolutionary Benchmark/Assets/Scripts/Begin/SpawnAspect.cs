@@ -37,7 +37,7 @@ public readonly partial struct SpawnAspect : IAspect
     [BurstCompile]
     public void SpawnEntity(EntityCommandBuffer.ParallelWriter ecb, EntityCommandBuffer.ParallelWriter ecb2, int sortKey, int newSpawnCount, int maxToSpawnCount, int toKeepSpawn,NativeArray<Entity> toKeep, /*NativeArray<RefRef<TransformAspect>> toKeepTransforms,
         NativeArray<RefRef<HealthComponent>> toKeepHealth, NativeArray<RefRef<EnergyComponent>> toKeepEnergy, */NativeArray<RefRef<MaxHealthComponent>> toKeepMaxHealth, NativeArray<RefRef<MaxEnergyComponent>> toKeepMaxEnergy,
-        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup, int epoch, Entity fittestEntity) 
+        BufferLookup<TraitBufferComponent<int>> intBufferLookup, BufferLookup<TraitBufferComponent<float>> floatBufferLookup, int epoch, Entity fittestEntity, SimulationMode simMode) 
     {
         //Define boundaries as min and max points
         float maxX = spawnPoint.ValueRO.boundary.z;
@@ -63,16 +63,24 @@ public readonly partial struct SpawnAspect : IAspect
 
 
 
+
+
                 //Randomize speed and size values for newly spawned
                 bool success = intBufferLookup.TryGetBuffer(spawnPoint.ValueRO.prefab, out DynamicBuffer<TraitBufferComponent<int>> intBuffer);
 
+
+                int size = 10;
                 if (success)
                 {
                     for (int j = 0; j < intBuffer.Length; j++)
                     {
                         if (intBuffer[j].traitType == TraitType.size)
                         {
-                            intBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextInt(intBuffer[j].minValue, math.max(intBuffer[j].minValue, intBuffer[j].maxValue/2));
+                            if (simMode == SimulationMode.evolve)
+                            {
+                                intBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextInt(intBuffer[j].minValue, math.max(intBuffer[j].minValue, intBuffer[j].maxValue / 2));
+                            }
+                            size = intBuffer.ElementAt(j).value;
                         }
                     }
                 }
@@ -85,10 +93,16 @@ public readonly partial struct SpawnAspect : IAspect
                     {
                         if (floatBuffer[j].traitType == TraitType.speed)
                         {
-                            floatBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextFloat(math.min(floatBuffer[j].minValue * 2, floatBuffer[j].maxValue), floatBuffer[j].maxValue);
+                            if (simMode == SimulationMode.evolve)
+                            {
+                                floatBuffer.ElementAt(j).value = spawnPoint.ValueRW.random.NextFloat(math.min(floatBuffer[j].minValue * 2, floatBuffer[j].maxValue), floatBuffer[j].maxValue);
+                            }    
                         }
                     }
                 }
+
+
+                
 
                 Entity e;
                 if (fittestEntity.Version == -100)
@@ -107,7 +121,7 @@ public readonly partial struct SpawnAspect : IAspect
                 //int defaultSize = 10;// +epoch*5;
 
                 //Set the transform
-                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = 1};
+                UniformScaleTransform transform = new UniformScaleTransform { Position = pos, Rotation = quaternion.identity, Scale = size/10f};
                 ecb.SetComponent<LocalToWorldTransform>(sortKey, e, new LocalToWorldTransform { Value = transform });
             
                 //Set the boundary and target position 

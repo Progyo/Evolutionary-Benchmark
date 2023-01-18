@@ -9005,18 +9005,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d4cdb9b8e0c684ba623917d3257064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  phase: 3
+  phase: 0
   timeElapsed: 0
   epochDuration: 30
   currentEpoch: 0
   maxEpochs: 100
-  maxEntities: 4096
+  maxEntities: 2048
   seed: 10
   prefab: {fileID: 8219850041221293206, guid: 29f753f9d8356184791965170bfe6df3, type: 3}
-  fieldPrefab: {fileID: 458524696359127845, guid: f72aed0822555634cb4b3d6d4c0f7803,
+  fieldPrefab: {fileID: 458524696359127845, guid: 8f5b6f4c6c81c874ca03ac1e07b23321,
     type: 3}
   fields: 64
   survivePercent: 0
+  mode: 1
 --- !u!4 &1384976299
 Transform:
   m_ObjectHideFlags: 0
@@ -12855,7 +12856,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1848202911
 Transform:
   m_ObjectHideFlags: 0

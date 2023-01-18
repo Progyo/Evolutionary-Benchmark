@@ -58,7 +58,7 @@ public partial struct MutationSystem : ISystem
     {
         RefRW<SimStateComponent> simState = SystemAPI.GetSingletonRW<SimStateComponent>();
 
-        if ( simState.ValueRO.phase == Phase.start)
+        if ( simState.ValueRO.phase == Phase.start && simState.ValueRO.mode == SimulationMode.evolve)
         {
             RefRW<RandomComponent> random = SystemAPI.GetSingletonRW<RandomComponent>();
             

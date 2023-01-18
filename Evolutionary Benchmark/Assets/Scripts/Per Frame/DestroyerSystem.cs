@@ -72,7 +72,9 @@ public partial class DestroyerSystem : SystemBase
                         timeElapsed = simState.ValueRO.timeElapsed,
                         fields = simState.ValueRO.fields,
                         killedThisGen = simState.ValueRO.killedThisGen + killed,
-                        survivePercent = simState.ValueRO.survivePercent
+                        survivePercent = simState.ValueRO.survivePercent,
+                        fieldEntityPrefab = simState.ValueRO.fieldEntityPrefab,
+                        mode = simState.ValueRO.mode,
                     });
                 }
             }
@@ -103,6 +105,8 @@ public partial class DestroyerSystem : SystemBase
                     fields = simState.ValueRO.fields,
                     killedThisGen = simState.ValueRO.killedThisGen,
                     survivePercent = simState.ValueRO.survivePercent,
+                    fieldEntityPrefab = simState.ValueRO.fieldEntityPrefab,
+                    mode = simState.ValueRO.mode,
                 });
 
             }
@@ -141,7 +145,9 @@ public partial class DestroyerSystem : SystemBase
                     timeElapsed = simState.ValueRO.timeElapsed,
                     fields = simState.ValueRO.fields,
                     killedThisGen = simState.ValueRO.killedThisGen,
-                    survivePercent = simState.ValueRO.survivePercent
+                    survivePercent = simState.ValueRO.survivePercent,
+                    fieldEntityPrefab = simState.ValueRO.fieldEntityPrefab,
+                    mode = simState.ValueRO.mode,
                 });
             }
 
