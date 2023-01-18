@@ -2,7 +2,7 @@ import json
 import numpy as np
 
 #The epochs to plot
-epochs = [5, 25, 100]
+epochs = [9] #,5, 25, 100
 
 
 filePath= "../Data/run2-pop_4096_health_100_energy_50_foodCount_best_init_progressive.json"
@@ -153,8 +153,8 @@ for epoch in epochs:
     plots.append(GetPlot(medianSize, upperQuantSize[0], lowerQuantSize[0], upperWhiskSize[0], lowerWhiskSize[0]))
     plots.append(GetPlot(medianFitness, upperQuantFitness[0], lowerQuantFitness[0], upperWhiskFitness[0], lowerWhiskFitness[0]))
     #plots.append(GetPlot(medianHealth, upperQuantHealth[0], lowerQuantHealth[0], upperWhiskHealth[0], lowerWhiskHealth[0]))
-    #plots.append(GetPlot(medianEnergy, upperQuantEnergy[0], lowerQuantEnergy[0], upperWhiskEnergy[0], lowerWhiskEnergy[0]))
+    plots.append(GetPlot(medianEnergy, upperQuantEnergy[0], lowerQuantEnergy[0], upperWhiskEnergy[0], lowerWhiskEnergy[0]))
 
 
-    print(GetFigure(1.0,["Speed", "Size", "Fitness"],plots)) #, "Health", "Energy"
+    print(GetFigure(1.0,["Speed", "Size", "Fitness", "Energy"],plots)) #, "Health", "Energy"
     
