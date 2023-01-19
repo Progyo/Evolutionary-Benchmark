@@ -192,6 +192,9 @@ xHisto, xLabel = np.histogram(x,bins=30)
 yHisto, yLabel = np.histogram(y,bins=30)
 
 
+print("Red: Mean: {} SD: {}".format(np.mean(valuesX),np.std(valuesX)))
+print("Blue: Mean: {} SD: {}".format(np.mean(valuesY),np.std(valuesY)))
+
 plots.append(GetPlot(np.round(xLabel[:-1],10),xHisto))
 
 print(GetFigure(1.0,0,max(xHisto) * 5 / 4, plots))
