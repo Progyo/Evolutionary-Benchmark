@@ -8,7 +8,7 @@ import numpy as np
 bins = 15
 
 
-filePath= "../Data/comparison-pop_4096_health_100_energy_50_speed10size3_vspeed5size5__progressive.json"
+filePath= "../Data/comparison2-pop_4096_health_100_energy_50_speed10size3_vspeed5size5.json"
 
 #The trait on the X axis
 trait = "size"
@@ -188,10 +188,13 @@ x,y = CleanUp(valuesX,valuesY)
 
 plots = []
 
-xHisto, xLabel = np.histogram(x,bins=100)
-yHisto, yLabel = np.histogram(y,bins=100)
+xHisto, xLabel = np.histogram(x,bins=30)
+yHisto, yLabel = np.histogram(y,bins=30)
 
 
-plots.append(GetPlot(np.round(xLabel[:-1],2),xHisto))
+plots.append(GetPlot(np.round(xLabel[:-1],10),xHisto))
 
 print(GetFigure(1.0,0,max(xHisto) * 5 / 4, plots))
+
+
+print(GetFigure(1.0,0,max(yHisto) * 5 / 4, [GetPlot(np.round(yLabel[:-1],10),yHisto)]))
